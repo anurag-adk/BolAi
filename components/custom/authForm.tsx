@@ -67,7 +67,7 @@ const AuthForm = ({ type }: any) => {
           <h2 className="text-4xl font-semibold text-green-500/70">BolAi</h2>
         </div>
         <h3 className="text-md md:text-2xl lg:text-[1.05rem] text-green-400/90">
-          Practice job interview with AI
+          Speak. Practice. Succeed.
         </h3>
       </div>
       <Form {...form}>
@@ -101,7 +101,7 @@ const AuthForm = ({ type }: any) => {
           />
           <Button
             type="submit"
-            className="hover:cursor-pointer bg-green-400/90 hover:bg-green-600 hover:text-white transition-all ease-in-out duration-150 hover:scale-105 p-2 w-[85%] lg:w-[60%] h-[6.5vh]"
+            className="hover:cursor-pointer bg-green-500/60 hover:bg-green-600 text-white transition-all ease-in-out duration-150 hover:scale-105 p-2 w-[85%] lg:w-[60%] h-[6.5vh]"
           >
             {isSignup ? "Create an account" : "Access the account"}
           </Button>
@@ -113,7 +113,7 @@ const AuthForm = ({ type }: any) => {
         </p>
         <Link
           href={isSignup ? "/login" : "/signup"}
-          className="font-bold text-sm lg:text-md text-blue-400 underline"
+          className="font-bold text-sm lg:text-md text-blue-400 underline transition-all ease-in-out duration-150 hover:scale-110"
         >
           {isSignup ? "Sign In" : "Sign Up"}
         </Link>
