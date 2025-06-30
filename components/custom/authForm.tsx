@@ -60,13 +60,13 @@ const AuthForm = ({ type }: any) => {
   const isSignup = type === "signup";
 
   return (
-    <div className="p-8 border-1 border-gray-200/25 rounded-2xl flex flex-col justify-start items-center  w-[85%] lg:w-[30%] md:w-[55%] bg-black/25 lg:m-[2rem]">
+    <div className="p-8 border-1 border-gray-200/25 rounded-2xl flex flex-col justify-center items-center w-[95%] lg:w-[30%] md:w-[55%] bg-black/25 lg:m-[2rem]">
       <div className="w-full flex flex-col justify-start items-center mb-4 p-2  rounded-2xl bg-transparent">
         <div className="w-full lg:w-[55%] flex justify-center items-center bg-transparent mb-2 lg:mb-0">
           <div className="w-[55%] h-[10vh] lg:h-[22vh] bg-transparent bg-motif mr-1"></div>
           <h2 className="text-4xl font-semibold text-green-500/70">BolAi</h2>
         </div>
-        <h3 className="text-lg md:text-2xl lg:text-[1.05rem] text-green-400/90">
+        <h3 className="text-md md:text-2xl lg:text-[1.05rem] text-green-400/90">
           Practice job interview with AI
         </h3>
       </div>

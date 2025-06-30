@@ -28,7 +28,7 @@ const FormField = ({
             placeholder={placeholder}
             {...field}
             type={type}
-            className="h-[6.5vh] px-4 focus:outline-none focus:ring-2 focus:ring-green-500 !ring-green-400/90 my-2"
+            className="h-[7.5vh] lg:h-[6.5vh] px-4 focus:outline-none focus:ring-2 focus:ring-green-500 !ring-green-400/90 my-2"
           />
         </FormControl>
         <FormMessage />
