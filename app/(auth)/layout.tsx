@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 
 const AuthLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="min-h-screen overflow-y-auto w-full flex flex-col justify-center items-center">
+    <div className="min-h-screen overflow-y-auto w-full flex flex-col justify-center items-center pattern">
       {children}
     </div>
   );
