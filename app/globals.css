@@ -119,12 +119,6 @@
   }
 }
 
-.pattern {
-  background-image: url("../public/pattern.png");
-  background-position: top;
-  background-repeat: no-repeat;
-}
-
 .bg-motif {
   background-image: url("/motif.png");
   background-position: center;
