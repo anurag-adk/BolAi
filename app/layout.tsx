@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Mona_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import LenisProvider from "@/lib/lenisProvider";
 
 const monaSans = Mona_Sans({
   variable: "--font-mona-sans",
@@ -21,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${monaSans.className} antialiased`}>
-        {children}
+        <LenisProvider>{children}</LenisProvider>
         <Toaster />
       </body>
     </html>
