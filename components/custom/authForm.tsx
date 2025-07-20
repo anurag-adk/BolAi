@@ -15,6 +15,12 @@ import { toast } from "sonner";
 import FormField from "./formField";
 import { useRouter } from "next/navigation";
 import { FaArrowLeft } from "react-icons/fa";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { auth } from "@/firebase/client";
+import { signIn, signup } from "@/lib/actions/auth.action";
 
 //ShadCn Form Component:
 const authFormSchema = (type: any) => {
@@ -40,15 +46,56 @@ const AuthForm = ({ type }: any) => {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       if (type === "signup") {
-        toast.success("Successfully Registered!");
+        //Get The Values From The Form
+        const { name, email, password } = values;
+        //Using The Firebase In-Built Function
+        const userCredentials = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        //Using the signup method
+        const result = await signup({
+          uid: userCredentials.user.uid,
+          name: name!,
+          email: email,
+          password: password,
+        });
+        //If The Signup Failed
+        if (!result?.success) {
+          toast.error(result?.message);
+          return;
+        }
+        toast.success("Successfully Registered! Redirecting To Login Page!");
         router.push("/login");
         console.log("Signed Up!", values);
       } else {
+        //Values coming from zod
+        const { email, password } = values;
+        //Firebase In-Built Function For Auth
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        const idToken = await userCredential.user.getIdToken();
+        //If Token Creation Failed
+        if (!idToken) {
+          toast.error("Sign-In Failed!");
+          return;
+        }
+        //Login Success
+        const loggedInUser = await signIn({ email, idToken });
+        //Check If It Was Failed
+        if (!loggedInUser?.success) {
+          toast.error(loggedInUser?.message);
+          return;
+        }
         toast.success("Successfully LoggedIn!");
-        router.push("/");
+        router.push("/home");
         console.log("Signed In!", values);
       }
     } catch (error) {
