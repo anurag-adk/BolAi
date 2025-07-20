@@ -1,6 +1,14 @@
+import { isAuthenticated } from "@/lib/actions/auth.action";
+import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 
-const dashboardLayout = ({ children }: { children: ReactNode }) => {
+const dashboardLayout = async ({ children }: { children: ReactNode }) => {
+  //Check Whether The User Is Authenticated:
+  const isUserAuthenticated = await isAuthenticated();
+  //If Not Authenticated Navigate Them Back:
+  if (!isUserAuthenticated) {
+    redirect("/login");
+  }
   return (
     <div className="w-full flex flex-col justify-start items-center">
       {/* Navbar After Login */}
