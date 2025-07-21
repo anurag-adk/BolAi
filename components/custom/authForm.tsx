@@ -4,7 +4,7 @@
 "use client";
 
 //Imports:
-import React from "react";
+import React, { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -15,12 +15,14 @@ import { toast } from "sonner";
 import FormField from "./formField";
 import { useRouter } from "next/navigation";
 import { FaArrowLeft } from "react-icons/fa";
+import { ImSpinner8 } from "react-icons/im";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "@/firebase/client";
 import { signIn, signup } from "@/lib/actions/auth.action";
+import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 
 //ShadCn Form Component:
 const authFormSchema = (type: any) => {
@@ -45,10 +47,15 @@ const AuthForm = ({ type }: any) => {
     },
   });
 
+  //UseState Hook For Loading State:
+  const [isLoading, setIsLoading] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       if (type === "signup") {
+        setIsLoading(true);
         //Get The Values From The Form
         const { name, email, password } = values;
         //Using The Firebase In-Built Function
@@ -67,12 +74,15 @@ const AuthForm = ({ type }: any) => {
         //If The Signup Failed
         if (!result?.success) {
           toast.error(result?.message);
+          setIsLoading(false);
           return;
         }
+        setIsLoading(false);
         toast.success("Successfully Registered! Redirecting To Login Page!");
         router.push("/login");
         console.log("Signed Up!", values);
       } else {
+        setIsLoading(true);
         //Values coming from zod
         const { email, password } = values;
         //Firebase In-Built Function For Auth
@@ -85,6 +95,7 @@ const AuthForm = ({ type }: any) => {
         //If Token Creation Failed
         if (!idToken) {
           toast.error("Sign-In Failed!");
+          setIsLoading(false);
           return;
         }
         //Login Success
@@ -92,15 +103,20 @@ const AuthForm = ({ type }: any) => {
         //Check If It Was Failed
         if (!loggedInUser?.success) {
           toast.error(loggedInUser?.message);
+          setIsLoading(false);
           return;
         }
+        setIsLoading(false);
         toast.success("Successfully LoggedIn!");
         router.push("/home");
         console.log("Signed In!", values);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast.error(`There was an error ${error}`);
+      setIsLoading(false);
+      toast.error(
+        `Something went wrong while performing the operation. Please try again later. (Error Code: ${error.code})`
+      );
     }
   }
 
@@ -180,18 +196,40 @@ const AuthForm = ({ type }: any) => {
               type="email"
               placeholder="Your Email Address"
             />
-            <FormField
-              control={form.control}
-              name="password"
-              label="Password"
-              type="password"
-              placeholder="Your Password"
-            />
+            <div className="w-full flex justify-around items-center">
+              <div className="w-[85%]">
+                <FormField
+                  control={form.control}
+                  name="password"
+                  label="Password"
+                  type={isPasswordVisible ? "text" : "password"}
+                  placeholder="Your Password"
+                />
+              </div>
+              <div
+                className="ml-2 w-[13%] md:ml-1 md:w-[12%] lg:w-[10%] h-[5.5vh] bg-white rounded-md mt-6 transition-all ease-in-out duration-150 hover:cursor-pointer hover:scale-110 flex justify-center items-center"
+                onClick={() => {
+                  setIsPasswordVisible(!isPasswordVisible);
+                }}
+              >
+                {isPasswordVisible ? (
+                  <IoMdEyeOff className="text-3xl lg:text-2xl md:text-5xl font-semibold text-gray-900/80" />
+                ) : (
+                  <IoMdEye className="text-3xl lg:text-2xl md:text-5xl font-semibold text-gray-900/80" />
+                )}
+              </div>
+            </div>
             <Button
               type="submit"
               className="hover:cursor-pointer bg-green-500/60 hover:bg-green-600 text-white md:text-xl lg:text-sm transition-all ease-in-out duration-150 hover:scale-105 p-2 w-[85%] lg:w-[60%] h-[7.5vh] md:h-[6.5vh]"
             >
-              {isSignup ? "Create an account" : "Access the account"}
+              {isLoading ? (
+                <ImSpinner8 className="transition-all ease-in-out duration-150 animate-spin" />
+              ) : isSignup ? (
+                "Create an account"
+              ) : (
+                "Access the account"
+              )}
             </Button>
           </form>
         </Form>
