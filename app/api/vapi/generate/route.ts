@@ -41,7 +41,11 @@ export async function POST(request: Request) {
       role,
       type,
       level,
-      techstack: techstack.split(","),
+      techstack: Array.isArray(techstack)
+        ? techstack
+        : String(techstack)
+            .split(",")
+            .map((item) => item.trim()),
       questions: JSON.parse(questions),
       userId: userid,
       finalized: true,
