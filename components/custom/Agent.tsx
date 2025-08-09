@@ -1,11 +1,11 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 //CSR:
 "use client";
 import React, { useEffect, useState } from "react";
 import { MdCallEnd, MdCall } from "react-icons/md";
 import { ImSpinner8 } from "react-icons/im";
 import { FiMessageCircle } from "react-icons/fi";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { vapi } from "@/lib/vapi.sdk";
 
 interface AiInterviewProps {
@@ -45,9 +45,18 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
 
   //useEffect Hook executed in the initial mounting:
   useEffect(() => {
-    const onCallStart = () => setCallStatus(CallStatus.ACTIVE);
-    const onCallEnd = () => setCallStatus(CallStatus.FINISHED);
+    const onCallStart = () => {
+      console.log("Vapi call started successfully");
+      setCallStatus(CallStatus.ACTIVE);
+    };
+
+    const onCallEnd = () => {
+      console.log("Vapi call ended");
+      setCallStatus(CallStatus.FINISHED);
+    };
+
     const onMessage = (message: Message) => {
+      console.log("Vapi message received:", message);
       if (message.type === "transcript" && message.transcriptType === "final") {
         const role =
           message.role === "user" || message.role === "assistant"
@@ -60,39 +69,61 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
           content,
         };
 
+        console.log("Saving message:", newMessage);
         setMessages((prev) => [...prev, newMessage]);
       }
     };
+
     const onSpeechStart = () => {
-      const lastSpeaker = messages[messages.length - 1]?.role;
-      if (lastSpeaker === "user" || lastSpeaker === "assistant") {
-        setSpeakingRole(lastSpeaker);
-      }
+      console.log("Speech started");
+      setSpeakingRole("assistant");
     };
+
     const onSpeechEnd = () => {
+      console.log("Speech ended");
       setSpeakingRole(null);
     };
 
-    const onError = (error: Error) => console.error(error);
+    const onError = (error: any) => {
+      console.log("Vapi error event received:", error);
 
-    //Sending this eventListeners to Vapi
-    vapi.on("call-start", onCallStart);
-    vapi.on("call-end", onCallEnd);
-    vapi.on("message", onMessage);
-    vapi.on("speech-start", onSpeechStart);
-    vapi.on("speech-end", onSpeechEnd);
-    vapi.on("error", onError);
+      if (error?.type === "start-method-error") {
+        console.log(
+          "Start method error detected - this is usually not critical, ignoring..."
+        );
+        return;
+      }
 
-    //Remove them when the component get's unmounted!
-    return () => {
-      vapi.off("call-start", onCallStart);
-      vapi.off("call-end", onCallEnd);
-      vapi.off("message", onMessage);
-      vapi.off("speech-start", onSpeechStart);
-      vapi.off("speech-end", onSpeechEnd);
-      vapi.off("error", onError);
+      if (error?.message?.includes("Meeting has ended")) {
+        console.log("Meeting ended error - ignoring as this is expected");
+        return;
+      }
+
+      console.error("Critical Vapi error - resetting call status:", error);
+      setCallStatus(CallStatus.INACTIVE);
+      setSpeakingRole(null);
     };
-  }, []);
+
+    // Register event listeners
+    vapi
+      .on("call-start", onCallStart)
+      .on("call-end", onCallEnd)
+      .on("message", onMessage)
+      .on("speech-start", onSpeechStart)
+      .on("speech-end", onSpeechEnd)
+      .on("error", onError);
+
+    // Cleanup event listeners on unmount
+    return () => {
+      vapi
+        .off("call-start", onCallStart)
+        .off("call-end", onCallEnd)
+        .off("message", onMessage)
+        .off("speech-start", onSpeechStart)
+        .off("speech-end", onSpeechEnd)
+        .off("error", onError);
+    };
+  }, [userId, userName]);
 
   //useEffect Hook when anything changes:
   useEffect(() => {
@@ -102,18 +133,63 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
   }, [messages, callStatus, type, userId, router]);
 
   const handleCall = async () => {
-    setCallStatus(CallStatus.CONNECTING);
-    await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!, {
-      variableValues: {
-        username: userName,
-        userid: userId,
-      },
+    console.log("Starting Vapi call...");
+    console.log("Call parameters:", {
+      assistantId: process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID,
+      userName,
+      userId,
+      apiKey: process.env.NEXT_PUBLIC_VAPI_API_KEY ? "Present" : "Missing",
     });
+
+    setCallStatus(CallStatus.CONNECTING);
+
+    try {
+      if (!userName || userName.trim() === "") {
+        throw new Error("userName is required but not provided");
+      }
+      if (!userId || userId.trim() === "") {
+        throw new Error("userId is required but not provided");
+      }
+      await vapi.start(process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID!, {
+        variableValues: {
+          username: userName,
+          userid: userId,
+        },
+      });
+      console.log("Vapi call initiated successfully");
+    } catch (error: unknown) {
+      const err = error as Error & {
+        response?: {
+          status: number;
+          statusText: string;
+          data: unknown;
+        };
+        code?: string;
+      };
+      console.error("Vapi call failed:");
+      console.error("Error message:", err.message);
+      console.error("Error type:", typeof err);
+      console.error("Full error object:", err);
+      // Check for specific error types
+      if (err.response) {
+        console.error("HTTP Response Error:");
+        console.error("- Status:", err.response.status);
+        console.error("- Status Text:", err.response.statusText);
+        console.error("- Data:", err.response.data);
+      }
+      if (err.code) {
+        console.error("Error Code:", err.code);
+      }
+      setCallStatus(CallStatus.INACTIVE);
+      alert(`Failed to start call: ${err.message || "Unknown error occurred"}`);
+    }
   };
+
   const handleDisconnect = async () => {
     setCallStatus(CallStatus.FINISHED);
     await vapi.stop();
   };
+
   const isCallInactiveOrFinished =
     callStatus === CallStatus.INACTIVE || callStatus === CallStatus.FINISHED;
 
