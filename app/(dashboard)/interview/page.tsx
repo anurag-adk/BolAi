@@ -4,9 +4,11 @@ import React from "react";
 
 const InterviewPage = async () => {
   const user = await getCurrentUser();
+  const userName = (user as { name?: string })?.name ?? "You";
+
   return (
     <div className="min-h-screen w-full flex flex-col justify-start items-center overflow-auto">
-      <Agent userName="You" userId={user?.id ?? ""} type="generate" />
+      <Agent userName={userName} userId={user?.id ?? ""} type="generate" />
     </div>
   );
 };
