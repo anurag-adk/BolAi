@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { getCurrentUser } from "@/lib/actions/auth.action";
 import {
   AiOutlineBarChart,
   AiOutlineMessage,
@@ -13,7 +15,39 @@ import {
   AiOutlineThunderbolt,
 } from "react-icons/ai";
 
+interface User {
+  id: string;
+  name?: string;
+  email?: string;
+  [key: string]: unknown;
+}
+
 const Sidebar = () => {
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const currentUser = await getCurrentUser();
+        setUser(currentUser);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  // Get user initials for avatar
+  const getInitials = (name?: string) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
   return (
     <div className="w-72 bg-gray-800 border-r border-gray-700 flex flex-col h-screen sticky top-0">
       {/* Logo and Title */}
@@ -155,10 +189,14 @@ const Sidebar = () => {
       <div className="p-4 border-t border-gray-700 flex-shrink-0">
         <div className="flex items-center space-x-3">
           <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-            <span className="text-sm font-medium text-white">MJ</span>
+            <span className="text-sm font-medium text-white">
+              {user?.name ? getInitials(user.name) : "U"}
+            </span>
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium text-white">Anurag Adhikari</p>
+            <p className="text-sm font-medium text-white">
+              {user?.name || "User"}
+            </p>
             <p className="text-xs text-gray-400">Free Plan</p>
           </div>
         </div>
