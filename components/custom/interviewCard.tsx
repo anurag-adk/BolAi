@@ -39,7 +39,7 @@ const InterviewCard = ({
   ).format("MMM D, YYYY");
 
   return (
-    <div className="w-[95%] h-[48vh] md:w-[88%] md:h-[42vh] lg:w-[30%] lg:h-[48vh] bg-gray-900/80 rounded-md mb-6 md:mb-10 flex flex-col justify-start items-start transition-all ease-in-out duration-100 hover:cursor-pointer hover:scale-105 border-2 border-gray-800/60 hover:border-2 hover:border-gray-400 p-0 md:p-x-2 lg:p-0">
+    <div className="w-[95%] h-[48vh] md:w-[88%] md:h-[42vh] lg:w-[32%] lg:h-[48vh] bg-gray-900/80 rounded-md mb-6 md:mb-10 flex flex-col justify-start items-start transition-all ease-in-out duration-100 hover:cursor-pointer hover:scale-105 border-2 border-gray-800/60 hover:border-2 hover:border-gray-400 p-0 md:p-x-2 lg:p-0">
       {/* Logo and Tag */}
       <div className="w-[95%] flex justify-around items-center mt-6 mb-2">
         {/* Logo */}
