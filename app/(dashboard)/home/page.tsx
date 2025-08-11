@@ -35,17 +35,15 @@ const HomePage = () => {
           </Button>
         </div>
         {/* Banner Image */}
-        <div className="w-full md:w-[48%] lg:w-[45%] flex justify-center md:justify-end items-center p-4 md:p-2">
-          <div
-            className="w-[90%] h-[25vh] md:w-[85%] md:h-[32vh] lg:w-[80%] lg:h-[32vh] rounded-lg"
-            style={{
-              backgroundImage: `url(/backgroundMotif.png)`,
-              backgroundPosition: "center",
-              backgroundSize: "cover",
-              backgroundRepeat: "no-repeat",
-            }}
-          ></div>
-        </div>
+        <div
+          className="max-sm:hidden md:w-[32%] md:h-[34vh] lg:w-[20%] lg:h-[30vh]"
+          style={{
+            backgroundImage: `url(/backgroundMotif.png)`,
+            backgroundPosition: "center",
+            backgroundSize: "cover",
+            backgroundRepeat: "no-repeat",
+          }}
+        ></div>
       </div>
       {/* Displaying the users Interviews */}
       <div className="w-[95%] md:w-[95%] lg:w-[90%] flex flex-col justify-start items-start mt-8 mb-4">
