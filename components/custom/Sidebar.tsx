@@ -14,6 +14,8 @@ import {
   AiOutlineCreditCard,
   AiOutlineSetting,
   AiOutlineThunderbolt,
+  AiOutlineMenu,
+  AiOutlineClose,
 } from "react-icons/ai";
 
 interface User {
@@ -25,6 +27,7 @@ interface User {
 
 const Sidebar = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -49,23 +52,42 @@ const Sidebar = () => {
       .toUpperCase()
       .slice(0, 2);
   };
-  return (
-    <div className="w-72 bg-gray-800 border-r border-gray-700 flex flex-col h-screen sticky top-0">
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
+  // Sidebar content component
+  const SidebarContent = () => (
+    <>
       {/* Logo and Title */}
       <div className="p-6 border-b border-gray-700 flex-shrink-0">
-        <div className="flex items-center space-x-3">
-          {/* Logo */}
-          <div
-            className="w-10 h-10"
-            style={{
-              backgroundImage: `url('/motif.png')`,
-              backgroundSize: "cover",
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "center",
-            }}
-          ></div>
-          {/* Title */}
-          <div className="text-2xl font-bold text-green-500">BolAi</div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            {/* Logo */}
+            <div
+              className="w-10 h-10"
+              style={{
+                backgroundImage: `url('/motif.png')`,
+                backgroundSize: "cover",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center",
+              }}
+            ></div>
+            {/* Title */}
+            <div className="text-2xl font-bold text-green-500">BolAi</div>
+          </div>
+          {/* Close button for mobile */}
+          <button
+            onClick={closeMobileMenu}
+            className="md:hidden text-gray-400 hover:text-white"
+          >
+            <AiOutlineClose className="text-xl" />
+          </button>
         </div>
       </div>
 
@@ -86,6 +108,7 @@ const Sidebar = () => {
                 <a
                   href="/home"
                   className="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
+                  onClick={closeMobileMenu}
                 >
                   <AiOutlineBarChart className="mr-3 text-lg" />
                   Overview
@@ -93,6 +116,7 @@ const Sidebar = () => {
                 <a
                   href="/interview"
                   className="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
+                  onClick={closeMobileMenu}
                 >
                   <AiOutlineMessage className="mr-3 text-lg" />
                   Mock Interview
@@ -100,6 +124,7 @@ const Sidebar = () => {
                 <a
                   href="#"
                   className="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
+                  onClick={closeMobileMenu}
                 >
                   <AiOutlineHistory className="mr-3 text-lg" />
                   Interview History
@@ -107,6 +132,7 @@ const Sidebar = () => {
                 <a
                   href="#"
                   className="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
+                  onClick={closeMobileMenu}
                 >
                   <AiOutlineRobot className="mr-3 text-lg" />
                   Personalized AI
@@ -123,6 +149,7 @@ const Sidebar = () => {
                 <a
                   href="#"
                   className="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
+                  onClick={closeMobileMenu}
                 >
                   <AiOutlineQuestionCircle className="mr-3 text-lg" />
                   Question Bank
@@ -130,6 +157,7 @@ const Sidebar = () => {
                 <a
                   href="#"
                   className="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
+                  onClick={closeMobileMenu}
                 >
                   <AiOutlineBook className="mr-3 text-lg" />
                   Resources
@@ -146,6 +174,7 @@ const Sidebar = () => {
                 <Link
                   href="/profile"
                   className="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
+                  onClick={closeMobileMenu}
                 >
                   <AiOutlineUser className="mr-3 text-lg" />
                   My Profile
@@ -153,6 +182,7 @@ const Sidebar = () => {
                 <a
                   href="#"
                   className="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
+                  onClick={closeMobileMenu}
                 >
                   <AiOutlineCreditCard className="mr-3 text-lg" />
                   Subscription
@@ -160,6 +190,7 @@ const Sidebar = () => {
                 <a
                   href="#"
                   className="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
+                  onClick={closeMobileMenu}
                 >
                   <AiOutlineSetting className="mr-3 text-lg" />
                   Settings
@@ -202,7 +233,58 @@ const Sidebar = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile Header with Hamburger */}
+      <div className="md:hidden bg-gray-800 border-b border-gray-700 p-4 sticky top-0 z-50">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            {/* Logo */}
+            <div
+              className="w-8 h-8"
+              style={{
+                backgroundImage: `url('/motif.png')`,
+                backgroundSize: "cover",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center",
+              }}
+            ></div>
+            {/* Title */}
+            <div className="text-xl font-bold text-green-500">BolAi</div>
+          </div>
+          {/* Hamburger Menu Button */}
+          <button
+            onClick={toggleMobileMenu}
+            className="text-gray-400 hover:text-white p-2"
+          >
+            <AiOutlineMenu className="text-xl" />
+          </button>
+        </div>
+      </div>
+
+      {/* Desktop Sidebar */}
+      <div className="hidden md:flex w-72 bg-gray-800 border-r border-gray-700 flex-col h-screen sticky top-0">
+        <SidebarContent />
+      </div>
+
+      {/* Mobile Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 z-50">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50"
+            onClick={closeMobileMenu}
+          ></div>
+          {/* Sidebar */}
+          <div className="fixed inset-y-0 left-0 w-72 bg-gray-800 border-r border-gray-700 flex flex-col">
+            <SidebarContent />
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
