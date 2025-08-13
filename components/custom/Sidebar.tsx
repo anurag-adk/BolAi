@@ -186,7 +186,7 @@ const Sidebar = () => {
                 >
                   <AiOutlineCreditCard className="mr-3 text-lg" />
                   Subscription
-                </a>
+                </Link>
                 <a
                   href="#"
                   className="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
@@ -202,6 +202,7 @@ const Sidebar = () => {
       </div>
 
       {/* Free Plan Card */}
+      {/* REMAINING: Check Free status from profile anf show the card only if free plan*/}
       <div className="p-4 flex-shrink-0">
         <div className="bg-gray-700/50 border border-gray-600 rounded-lg p-4">
           <div className="flex items-center mb-3">
@@ -209,11 +210,13 @@ const Sidebar = () => {
             <span className="text-sm font-semibold text-white">Free Plan</span>
           </div>
           <p className="text-xs text-gray-400 mb-3 leading-relaxed">
-            Upgrade to access more call credits & powerful features!
+            Upgrade to access more interview credits & powerful features!
           </p>
-          <button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-md transition-colors">
-            Upgrade
-          </button>
+          <Link href="/subscription" onClick={closeMobileMenu}>
+            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-md transition-colors">
+              Upgrade
+            </button>
+          </Link>
         </div>
       </div>
 
