@@ -11,11 +11,11 @@ const dashboardLayout = async ({ children }: { children: ReactNode }) => {
     redirect("/login");
   }
   return (
-    <div className="w-full min-h-screen flex bg-gray-900">
+    <div className="w-full min-h-screen flex flex-col md:flex-row bg-gray-900">
       <Sidebar />
 
       {/* Main Content Area */}
-      <div className="flex-1 overflow-auto bg-gray-900">{children}</div>
+      <div className="flex-1 overflow-y-auto bg-gray-900">{children}</div>
     </div>
   );
 };

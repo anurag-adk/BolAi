@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { getCurrentUser } from "@/lib/actions/auth.action";
 import {
   AiOutlineBarChart,
@@ -142,13 +143,13 @@ const Sidebar = () => {
                 Account
               </h3>
               <div className="space-y-1">
-                <a
-                  href="#"
+                <Link
+                  href="/profile"
                   className="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
                 >
                   <AiOutlineUser className="mr-3 text-lg" />
                   My Profile
-                </a>
+                </Link>
                 <a
                   href="#"
                   className="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
