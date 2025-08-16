@@ -111,6 +111,21 @@ export const setSessionCookie = async (idToken: string) => {
   }
 };
 
+export const clearSessionCookie = async () => {
+  try {
+    const cookieStore = await cookies();
+    cookieStore.set("session", "", {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      secure: false,
+      maxAge: 0,
+    });
+  } catch (e) {
+    console.error(`There was error while logging out! ${e}`);
+  }
+};
+
 //This will provide the currentLoggedIn User To The FrontEnd So That we can protect the routes
 export const getCurrentUser = async () => {
   const cookieStore = await cookies();
