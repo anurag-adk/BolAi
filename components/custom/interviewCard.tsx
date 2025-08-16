@@ -45,7 +45,7 @@ const InterviewCard = ({
       <div className="w-[95%] flex justify-around items-center mt-6 mb-2">
         {/* Logo */}
         <div
-          className="w-[24.8%] h-[11.4vh] md:w-[21.8%] md:h-[11.8vh] lg:w-[24.8%] lg:h-[11.4vh] rounded-md bg-transparent"
+          className="w-[24.8%] h-[11.4vh] md:w-[34.2%] md:h-[11.8vh] lg:w-[24.8%] lg:h-[11.4vh] rounded-md bg-transparent aspect-square"
           style={{
             backgroundImage: `url(${imagePath})`,
             backgroundPosition: "center",
@@ -65,7 +65,7 @@ const InterviewCard = ({
               : "bg-lime-600/80"
           } flex justify-center items-center`}
         >
-          <div className="text-sm md:text-lg lg:text-sm text-white">{type}</div>
+          <div className="text-sm md:text-xl lg:text-sm text-white">{type}</div>
         </div>
       </div>
       {/* Role for the interview     */}
@@ -109,10 +109,10 @@ const InterviewCard = ({
         </div>
         {/* Buttons */}
         <Link
-          className="w-[38%] h-[6vh] bg-green-600/80 rounded-md flex justify-center items-center transition-all ease-in-out duration-150 hover:scale-105 hover:cursor-pointer hover:bg-green-400/70"
+          className="w-[38%] md:w-[44%] md:p-2 lg:w-[38%] h-[6vh] bg-green-600/80 rounded-md flex justify-center items-center transition-all ease-in-out duration-150 hover:scale-105 hover:cursor-pointer hover:bg-green-400/70"
           href={feedback ? `/interview/${id}/feedback` : `/interview/${id}`}
         >
-          <div className="text-center text-white font-semibold text-sm md:text-lg lg:text-sm">
+          <div className="text-center text-white font-semibold text-sm md:text-xl lg:text-sm">
             {feedback ? "Check Feedback" : "View Interview"}
           </div>
         </Link>
