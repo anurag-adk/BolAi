@@ -7,12 +7,14 @@
 //Imports
 import { auth, db } from "@/firebase/admin";
 import { cookies } from "next/headers";
+import { sendMail } from "../nodemailer";
 
 interface signUpParams {
   uid: string;
   name: string;
   email: string;
   password: string;
+  otp: number;
 }
 
 interface signInParams {
@@ -21,7 +23,7 @@ interface signInParams {
 }
 
 export const signup = async (params: signUpParams) => {
-  const { uid, name, email, password } = params;
+  const { uid, name, email, password, otp } = params;
   try {
     //Check If The User Already Exists In The System!
     const userRecord = await db.collection("users").doc(uid).get();
@@ -35,6 +37,8 @@ export const signup = async (params: signUpParams) => {
     const newUser = await db.collection("users").doc(uid).set({
       name,
       email,
+      otp,
+      isEmailValid: false, //Boolean Value By Default Must Be Verified!
     });
     //Check If Creation Was Success
     if (!newUser) {
@@ -43,6 +47,12 @@ export const signup = async (params: signUpParams) => {
         message: "Failed to create a new user in the platform!",
       };
     }
+    //Send The Mail:
+    await sendMail({
+      type: "otp",
+      receiver: email,
+      otp,
+    });
     //Return Success Message
     return {
       success: true,
@@ -62,7 +72,7 @@ export const signup = async (params: signUpParams) => {
     //DB or Server Error:
     return {
       success: false,
-      message: "Failed a new account for the user!",
+      message: "Failed to create a new account for the user!",
     };
   }
 };
@@ -78,11 +88,28 @@ export const signIn = async (params: signInParams) => {
         message: "The user not found in the system!",
       };
     }
+    // Query your database to get user data
+    const user = await db.collection("users").where("email", "==", email).get();
+    if (user.empty) {
+      return {
+        success: false,
+        message: "User not found in database",
+      };
+    }
+    const userData = user.docs[0].data();
+    // Check if email is validated
+    if (!userData.isEmailValid) {
+      return {
+        success: false,
+        message:
+          "Please verify your email before logging in. Check your inbox for the verification code.",
+      };
+    }
     await setSessionCookie(idToken);
     //Send The Success Message
     return {
       success: true,
-      message: "Successfully Created A New User!",
+      message: "Login successful!",
     };
   } catch (error) {
     console.error(`Unable to authenticate the user. Error: ${error}`);
