@@ -153,7 +153,7 @@ export const clearSessionCookie = async () => {
   }
 };
 
-//This will provide the currentLoggedIn User To The FrontEnd So That we can protect the routes
+//This will provide the currentLoggedIn User To The FrontEnd So That we can protect the routes:
 export const getCurrentUser = async () => {
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get("session")?.value;
@@ -179,7 +179,64 @@ export const getCurrentUser = async () => {
   }
 };
 
-//Confirm The User Has Been Authenticated
+//This will help to fetch the generated interviews for the current user:
+export async function fetchGeneratedInterviews(userId: string) {
+  try {
+    const interviews = await db
+      .collection("interviews")
+      .where("userId", "==", userId)
+      .orderBy("createdAt", "desc")
+      .get();
+    //If Interviews are empty then return a friendly message:
+    if (interviews.empty || interviews.docs.length == 0) {
+      return null;
+    }
+    //If there is data:
+    const interviewData = interviews.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as [];
+    //Return The Array:
+    return interviewData;
+  } catch (error: any) {
+    console.error("Error fetching interviews:", error.message || error);
+    return null;
+  }
+}
+
+//This will help to fetch the generated interviews by the other users["Community"]:
+export async function fetchLatestGeneratedInterviews(params: {
+  userId: string;
+  limit: number;
+}) {
+  try {
+    //Get The Values From Params:
+    const { userId, limit = 20 } = params;
+    const interviews = await db
+      .collection("interviews")
+      .orderBy("createdAt", "desc")
+      .where("finalized", "==", true)
+      .where("userId", "!=", userId)
+      .limit(limit)
+      .get();
+    //Check For The Fetched Interviews:
+    if (interviews.docs.length === 0 || interviews.empty) {
+      return null;
+    }
+    //If There Is Interview Data:
+    const interviewData = interviews.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as [];
+    //Return the array:
+    return interviewData;
+  } catch (error: any) {
+    console.error("Error Fetching Interviews:", error.message || error);
+    return null;
+  }
+}
+
+//Confirm The User Has Been Authenticated:
 export const isAuthenticated = async () => {
   const user = await getCurrentUser();
   return !!user; //If Data Returns -> True Else False, If True then only get the value!
