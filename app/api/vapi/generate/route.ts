@@ -1,12 +1,9 @@
 import { generateText } from "ai";
-import { google } from "@ai-sdk/google";
+import { groq } from "@ai-sdk/groq";
 import { db } from "@/firebase/admin";
 
 export async function GET() {
-  console.log(
-    "GOOGLE_GENERATIVE_AI_API_KEY:",
-    process.env.GOOGLE_GENERATIVE_AI_API_KEY
-  );
+  console.log("GROQ_API_KEY:", process.env.GROQ_API_KEY);
   return Response.json({
     success: true,
     message: "THANK YOU!",
@@ -19,7 +16,7 @@ export async function POST(request: Request) {
     await request.json();
   try {
     const { text: questions } = await generateText({
-      model: google("gemini-1.5-pro"),
+      model: groq("llama-3.3-70b-versatile"),
       prompt: `Prepare interview questions for a job.
 
         Job Role: ${role}
