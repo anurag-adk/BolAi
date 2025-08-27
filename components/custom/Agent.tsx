@@ -42,6 +42,9 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
   );
   const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
   const [messages, setMessages] = useState<SavedMessage[]>([]);
+  const [speechTimeoutId, setSpeechTimeoutId] = useState<NodeJS.Timeout | null>(
+    null
+  );
   const latestMessage = messages[messages.length - 1]?.content;
 
   //useEffect Hook executed in the initial mounting:
@@ -58,6 +61,36 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
 
     const onMessage = (message: Message) => {
       console.log("Vapi message received:", message);
+
+      // Clear any existing timeout
+      if (speechTimeoutId) {
+        clearTimeout(speechTimeoutId);
+      }
+
+      // Detect user speech from any transcript with role "user"
+      if (message.type === "transcript" && message.role === "user") {
+        setSpeakingRole("user");
+        console.log("User is speaking (detected from transcript)");
+
+        // Set timeout to clear speaking state if no more user speech detected
+        const timeoutId = setTimeout(() => {
+          setSpeakingRole(null);
+        }, 5000); // Clear after 5 seconds of no speech
+        setSpeechTimeoutId(timeoutId);
+      }
+
+      // Detect assistant speech from assistant messages
+      if (message.type === "transcript" && message.role === "assistant") {
+        setSpeakingRole("assistant");
+        console.log("Assistant is speaking (detected from transcript)");
+
+        // Set timeout to clear speaking state if no more assistant speech detected
+        const timeoutId = setTimeout(() => {
+          setSpeakingRole(null);
+        }, 5000); // Clear after 5 seconds of no speech
+        setSpeechTimeoutId(timeoutId);
+      }
+
       if (message.type === "transcript" && message.transcriptType === "final") {
         const role =
           message.role === "user" || message.role === "assistant"
@@ -76,13 +109,20 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
     };
 
     const onSpeechStart = () => {
-      console.log("Speech started");
-      setSpeakingRole("assistant");
+      console.log(
+        "Speech started - waiting for transcript to determine speaker"
+      );
+      // Don't set speaking role here, wait for transcript to determine who's speaking
     };
 
     const onSpeechEnd = () => {
-      console.log("Speech ended");
+      console.log("Speech ended - clearing speaking role");
       setSpeakingRole(null);
+      // Clear any pending timeouts
+      if (speechTimeoutId) {
+        clearTimeout(speechTimeoutId);
+        setSpeechTimeoutId(null);
+      }
     };
 
     const onError = (error: any) => {
@@ -116,6 +156,11 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
 
     // Cleanup event listeners on unmount
     return () => {
+      // Clear timeout if exists
+      if (speechTimeoutId) {
+        clearTimeout(speechTimeoutId);
+      }
+
       vapi
         .off("call-start", onCallStart)
         .off("call-end", onCallEnd)
@@ -124,7 +169,7 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
         .off("speech-end", onSpeechEnd)
         .off("error", onError);
     };
-  }, [userId, userName]);
+  }, [userId, userName, speechTimeoutId]);
 
   //useEffect Hook when anything changes:
   useEffect(() => {
@@ -205,13 +250,13 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
           {type === "generate" ? "Interview Generation" : ""}
         </div>
         {/* The Interview Cards */}
-        <div className="w-full flex flex-col lg:flex-row lg:justify-around justify-center items-center gap-4 mt-[1rem] mb-[2rem]">
+        <div className="w-full flex flex-col lg:flex-row lg:justify-around justify-center items-center md:items-center gap-4 mt-[1rem] mb-[2rem]">
           {/* Ai Interviewer Card */}
           <div
-            className={`w-[95%] lg:w-[40%] md:w-[82%] h-[55vh] md:h-[38vh] lg:h-[48vh] bg-transparent flex flex-col justify-center items-center rounded-md transition-all ease-in-out duration-150 md:mb-[2rem] ${
+            className={`w-[95%] lg:w-[40%] md:w-[82%] h-[55vh] md:h-[48vh] lg:h-[48vh] bg-transparent flex flex-col justify-center items-center rounded-md transition-all ease-in-out duration-300 border-2 mb-0 md:mb-4 lg:mb-0 ${
               speakingRole === "assistant"
-                ? "border-green-500/80 bg-neutral-900 scale-105"
-                : "border-1 border-gray-300/90"
+                ? "border-green-500 bg-neutral-900 scale-105 shadow-lg shadow-green-500/30"
+                : "border-gray-300/50"
             }`}
           >
             {/* Motif And Pulse */}
@@ -250,10 +295,10 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
           </div>
           {/* User Interview Card */}
           <div
-            className={`max-sm:hidden lg:w-[40%] md:w-[82%] md:h-[38vh] lg:h-[48vh] transition-all ease-in-out duration-150 bg-transparent flex flex-col justify-center items-center rounded-md border-1 ${
+            className={`max-sm:hidden lg:w-[40%] md:w-[82%] h-[55vh] md:h-[48vh] lg:h-[48vh] transition-all ease-in-out duration-300 bg-transparent flex flex-col justify-center items-center rounded-md border-2 ${
               speakingRole === "user"
-                ? "border-blue-500/80 bg-neutral-900 scale-105"
-                : "border-white"
+                ? "border-blue-500 bg-neutral-900 scale-105 shadow-lg shadow-blue-500/30"
+                : "border-white/50"
             }`}
           >
             <div className="relative flex justify-center items-center w-[22%] aspect-square mb-6">
@@ -298,7 +343,7 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
               style={{
                 animation: "fadeIn 0.5s ease-in-out forwards",
               }}
-              className="text-md md:text-xl lg:text-sm text-white text-justify p-3 opacity-75 md:mb-2 lg:mb-0"
+              className="text-lg md:text-2xl lg:text-xl text-white text-justify p-3 opacity-90 md:mb-2 lg:mb-0 leading-relaxed"
               key={latestMessage}
             >
               {latestMessage}

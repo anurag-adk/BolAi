@@ -12,7 +12,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const { type, role, level, techstack, amount, userid, coverUrl } =
+  const { type, role, level, techstack, amount, userid, imagePath } =
     await request.json();
   try {
     const { text: questions } = await generateText({
@@ -46,11 +46,24 @@ export async function POST(request: Request) {
         : String(techstack)
             .split(",")
             .map((item) => item.trim()),
-      questions: JSON.parse(questions),
+      questions: (() => {
+        try {
+          const cleaned = questions
+            .trim()
+            .replace(/```json/g, "")
+            .replace(/```/g, "");
+          return JSON.parse(cleaned);
+        } catch {
+          return [
+            `What interests you most about the ${role} position?`,
+            `Describe your experience with ${techstack}.`,
+          ];
+        }
+      })(),
       userId: userid,
       finalized: true,
-      coverUrl: coverUrl
-        ? coverUrl
+      imagePath: imagePath
+        ? imagePath
         : "https://placehold.co/150x150/28a745/ffffff?text=BolAi&font=roboto&size=28",
       createdAt: new Date().toISOString(),
     };
