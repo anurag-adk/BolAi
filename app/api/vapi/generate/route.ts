@@ -83,6 +83,10 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error(error);
-    return Response.json({ success: false, message: error, statusCode: 500 });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return Response.json(
+      { success: false, message: errorMessage },
+      { status: 500 }
+    );
   }
 }
