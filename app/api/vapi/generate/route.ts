@@ -3,7 +3,10 @@ import { google } from "@ai-sdk/google";
 import { db } from "@/firebase/admin";
 
 export async function GET() {
-  console.log("GOOGLE_API_KEY:", process.env.GOOGLE_API_KEY);
+  console.log(
+    "GOOGLE_GENERATIVE_AI_API_KEY:",
+    process.env.GOOGLE_GENERATIVE_AI_API_KEY
+  );
   return Response.json({
     success: true,
     message: "THANK YOU!",
