@@ -8,6 +8,9 @@ import crypto from "crypto";
 //Imports For Db:
 import { db } from "@/firebase/admin";
 import { sendMail } from "./nodemailer";
+import redis from "./redisConfig";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/firebase/client";
 
 //Interface For The Payloads
 interface TokenPayload {
@@ -57,47 +60,55 @@ export async function regenerateToken(payload: TokenPayload) {
       .where("email", "==", payload.email)
       .limit(1)
       .get();
-    if (userRecord.empty) {
+    if (!userRecord.empty) {
       return {
-        success: false,
-        message: "No user found with the provided email",
+        success: true,
+        type: "success",
+        message: "The provided user is already verified.",
       };
     }
-    //If The Email Is Already Verified:
-    const emailAlreadyVerified = await db
-      .collection("users")
-      .where("email", "==", payload.email)
-      .where("isEmailValid", "==", true)
-      .limit(1)
-      .get();
-    if (!emailAlreadyVerified.empty) {
+    //Check If The Redis Values Is Available:
+    const userExists = ((await redis.get(payload.email)) as string) || null;
+    if (!userExists) {
       return {
         success: false,
-        message: "Provided email is already verified",
+        type: "resend",
+        message: "Session expired. Sign up again to receive a new OTP.",
       };
     }
+
+    // Handle both string and object cases from Redis
+    let userData;
+    try {
+      if (typeof userExists === "string") {
+        userData = JSON.parse(userExists);
+      } else {
+        // If Redis returned an object directly, use it as-is
+        userData = userExists;
+      }
+    } catch (parseError) {
+      console.error("Redis data parsing error:", parseError);
+      console.error("Raw Redis data:", userExists);
+      return {
+        success: false,
+        type: "resend",
+        message: "Session data corrupted. Sign up again to receive a new OTP.",
+      };
+    }
+
     //Now Generate A New Otp For The User:
     const otp = await generateOtp();
-    //Retrieve The UID And Data From The Retrieved User:
-    const userDoc = userRecord.docs[0];
-    const userData = userDoc.data();
+
     //Generate The Token:
     const token = await generateToken({
       email: userData.email!,
       name: userData.name!,
     });
-    //Update The DB With The New Token Id:
-    const newRecord = await db
-      .collection("users")
-      .doc(userDoc.id)
-      .update({ otp });
-    //Check If Update Is Successful:
-    if (!newRecord) {
-      return {
-        success: false,
-        message: "Unable to update the otp of the existing user!",
-      };
-    }
+
+    //Update The New OTP In Redis:
+    userData.otp = otp;
+    await redis.set(userData.email, JSON.stringify(userData), { ex: 300 });
+
     //Send The Mail To The User:
     await sendMail({
       type: "otp",
@@ -109,11 +120,13 @@ export async function regenerateToken(payload: TokenPayload) {
       success: true,
       token,
       message: "Successfully Created The New OTP",
+      type: "success",
     };
   } catch (error) {
     console.error(error);
     return {
       success: false,
+      type: "stay",
       message: "Error while regenerating the new otp code!",
     };
   }
@@ -131,60 +144,112 @@ export async function checkAndVerify(payload: verifyPayload) {
     ) {
       return {
         success: false,
+        type: "resend",
         message:
-          "Your token is invalid or expired. Click 'Didn't receive the code?' and enter your email to get a new OTP.",
+          "Your code expired or is invalid. Please sign up again to get a new one.",
       };
     }
-    //Check Whether The User Exists With The Provided Email And Name:
-    const userRecord = await db
-      .collection("users")
-      .where("email", "==", decodedData.email!)
-      .limit(1)
-      .get();
-    if (userRecord.empty) {
+
+    //Check Whether The User Exists With The Provided Email:
+    const userExists = (await redis.get(decodedData.email)) as string | null;
+
+    if (!userExists) {
       return {
         success: false,
-        message: "No user found with the provided email",
+        type: "resend",
+        message:
+          "Your session expired after 5 minutes. Please sign up again to continue.",
       };
     }
-    //Extract The UID and Other Info To Check The Otp Code!
+
+    // Handle both string and object cases from Redis
+    let userInfo;
+    try {
+      if (typeof userExists === "string") {
+        userInfo = JSON.parse(userExists);
+      } else {
+        // If Redis returned an object directly, use it as-is
+        userInfo = userExists;
+      }
+    } catch (parseError) {
+      console.error("Redis data parsing error:", parseError);
+      console.error("Raw Redis data:", userExists);
+      return {
+        success: false,
+        type: "resend",
+        message: "Session data corrupted. Please sign up again.",
+      };
+    }
+
+    //Check the rate whether it is exhausted:
+    if (userInfo.rate === 0) {
+      await redis.del(decodedData.email);
+      return {
+        success: false,
+        type: "resend",
+        message:
+          "You've used all your verification attempts. Please sign up again to continue.",
+      };
+    }
+
+    //Check the otp values:
     const otp = parseInt(payload.otpCode, 10); //Provided Otp
-    const userDoc = userRecord.docs[0];
-    const userData = userDoc.data();
-    //Check Whether The Provided Otp Matches The Extracted Otp:
-    if (otp !== userData.otp) {
+    if (otp !== userInfo.otp!) {
+      userInfo.rate -= 1;
+      // Update the rate in Redis
+      await redis.set(decodedData.email, JSON.stringify(userInfo), { ex: 300 });
       return {
         success: false,
-        message: "The OTP you entered is incorrect. Please try again.",
+        type: "stay",
+        message: `Invalid OTP. You have ${userInfo.rate} attempt(s) left to verify your account.`,
       };
     }
-    //Update The emailVerified and Otp field:
-    const newRecord = await db
+
+    //If the otp is valid then generate a new user in the db:
+    // Using The Firebase In-Built Function
+    const userCredentials = await createUserWithEmailAndPassword(
+      auth,
+      userInfo.email,
+      userInfo.password
+    );
+    //Create the new user into the db
+    const newUser = await db
       .collection("users")
-      .doc(userDoc.id)
-      .update({ isEmailValid: true, otp: 0 });
-    //Check If Update Is Successful:
-    if (!newRecord) {
+      .doc(userCredentials.user.uid)
+      .set({
+        name: userInfo.name,
+        email: userInfo.email,
+      });
+    //Check If Creation Was Success
+    if (!newUser) {
       return {
         success: false,
-        message: "Unable to verify the user's email.",
+        type: "resend",
+        message: "Failed to create a new user in the platform!",
       };
     }
+
     //Send The Validation Success Mail:
     await sendMail({
       type: "verified",
-      receiver: userData.email,
-      name: userData.name,
+      receiver: userInfo.email,
+      name: userInfo.name,
     });
+
+    // Clean up Redis data after successful verification
+    await redis.del(userInfo.email);
+
     //Success Response:
     return {
       success: true,
+      type: "success",
       message: "Email successfully verified.",
     };
   } catch (error) {
     console.error(error);
     return {
       success: false,
+      type: "stay",
       message: "Error while validating your OTP!",
     };
   }
