@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 //Server Side Rendering
@@ -8,9 +7,9 @@
 import { auth, db } from "@/firebase/admin";
 import { cookies } from "next/headers";
 import { sendMail } from "../nodemailer";
+import redis from "../redisConfig";
 
 interface signUpParams {
-  uid: string;
   name: string;
   email: string;
   password: string;
@@ -23,30 +22,41 @@ interface signInParams {
 }
 
 export const signup = async (params: signUpParams) => {
-  const { uid, name, email, password, otp } = params;
+  const { name, email, password, otp } = params;
   try {
-    //Check If The User Already Exists In The System!
-    const userRecord = await db.collection("users").doc(uid).get();
-    if (userRecord.exists) {
+    //Check If The User Already Exists In The Platform
+    const userDBRecord = await db
+      .collection("users")
+      .where("email", "==", email)
+      .limit(1)
+      .get();
+    if (userDBRecord) {
       return {
         success: false,
         message: "The provided info already exists for an user",
       };
     }
-    //If The User Doesn't Exist In The Platform, Create A New User
-    const newUser = await db.collection("users").doc(uid).set({
-      name,
-      email,
-      otp,
-      isEmailValid: false, //Boolean Value By Default Must Be Verified!
-    });
-    //Check If Creation Was Success
-    if (!newUser) {
+    //Check If The User Already Exists In The Redis
+    const userRecord = await redis.get(email);
+    if (userRecord) {
       return {
         success: false,
-        message: "Failed to create a new user in the platform!",
+        message:
+          "You have already created an account but have left to validate it.",
       };
     }
+    //Store it in the redis db which expires in 5m:
+    await redis.set(
+      email,
+      JSON.stringify({
+        name,
+        email,
+        password,
+        otp,
+        rate: 5,
+      }),
+      { ex: 300 }
+    );
     //Send The Mail:
     await sendMail({
       type: "otp",
@@ -56,7 +66,7 @@ export const signup = async (params: signUpParams) => {
     //Return Success Message
     return {
       success: true,
-      message: "Successfully Created!",
+      message: "Verify your email to access the account.",
     };
   } catch (error: any) {
     console.error(`Error while creating a new user: ${error}`);
@@ -88,6 +98,7 @@ export const signIn = async (params: signInParams) => {
         message: "The user not found in the system!",
       };
     }
+
     // Query your database to get user data
     const user = await db.collection("users").where("email", "==", email).get();
     if (user.empty) {
@@ -96,16 +107,10 @@ export const signIn = async (params: signInParams) => {
         message: "User not found in database",
       };
     }
-    const userData = user.docs[0].data();
-    // Check if email is validated
-    if (!userData.isEmailValid) {
-      return {
-        success: false,
-        message:
-          "Please verify your email before logging in. Check your inbox for the verification code.",
-      };
-    }
+
+    //Generate A Login Token:
     await setSessionCookie(idToken);
+
     //Send The Success Message
     return {
       success: true,

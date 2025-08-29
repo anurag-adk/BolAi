@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 //Client-Side Render:
 "use client";
@@ -14,24 +13,16 @@ import FormField from "./formField";
 import { useRouter } from "next/navigation";
 import { FaArrowLeft } from "react-icons/fa";
 import { ImSpinner8 } from "react-icons/im";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/client";
 import { signIn, signup } from "@/lib/actions/auth.action";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 
 //For Otp And JWT:
-import {
-  generateOtp,
-  generateToken,
-  regenerateToken,
-} from "@/lib/otpTokenUtils";
+import { generateOtp, generateToken } from "@/lib/otpTokenUtils";
 
 //ShadCn Components:
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 //ShadCn Form Component:
 const authFormSchema = (type: any) => {
@@ -56,37 +47,7 @@ const AuthForm = ({ type }: any) => {
   //UseState Hook For Loading State:
   const [isLoading, setIsLoading] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [emailValue, setEmailValue] = useState("");
-  const [isResendClicked, setIsResendClicked] = useState(false);
-  //RegEx For Email Checking:
-  const emailRegex =
-    /^(?!.*\.\.)[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,}$/;
-  // Function To Re-generate The Otp Token:
-  const resendTokenAndOtp = async () => {
-    //Set The Loading To True
-    setIsLoading(true);
-    //Checking The Provided Email
-    if (
-      emailValue.length <= 0 ||
-      !emailValue.trim() ||
-      !emailRegex.test(emailValue)
-    ) {
-      setIsLoading(false);
-      setIsResendClicked(false);
-      return toast.error("Must provide a valid email address.");
-    }
-    //If Valid Call The Function
-    const data = await regenerateToken({ email: emailValue });
-    //If Error Show The Toast
-    if (!data.success) {
-      setIsLoading(false);
-      setIsResendClicked(false);
-      return toast.error(data.message);
-    }
-    //If Valid
-    toast.success(data.message);
-    router.push(`/verify/${data.token}`);
-  };
+
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -94,17 +55,10 @@ const AuthForm = ({ type }: any) => {
         setIsLoading(true);
         //Get The Values From The Form
         const { name, email, password } = values;
-        //Using The Firebase In-Built Function
-        const userCredentials = await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
         //Creating The Otp Value:
         const otp = await generateOtp();
-        //Using the signup method
+        //Using the signup method:
         const result = await signup({
-          uid: userCredentials.user.uid,
           name: name!,
           email: email,
           password: password,
@@ -296,48 +250,6 @@ const AuthForm = ({ type }: any) => {
             {isSignup ? "Sign In" : "Sign Up"}
           </Link>
         </div>
-        {/* To Resend The Otp Code */}
-        {/* Resend Otp Link */}
-        {isSignup ? (
-          <></>
-        ) : (
-          <div
-            className={`flex justify-center items-center ${
-              isResendClicked ? "mb-[2rem]" : ""
-            }`}
-            onClick={() => setIsResendClicked((prev) => !prev)}
-          >
-            <div className="text-white text-sm md:text-xl lg:text-sm font-semibold transition-all ease-in-out duration-150 hover:scale-105 hover:cursor-pointer hover:underline hover:text-blue-400">
-              Didn't receive the code?
-            </div>
-          </div>
-        )}
-        {/* Show The Email Field */}
-        {isResendClicked ? (
-          <div className="flex w-[95%] max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl items-center gap-4">
-            <Input
-              type="email"
-              placeholder="Email"
-              className="h-12 md:h-14 lg:h-12 text-sm lg:text-sm md:text-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
-              value={emailValue}
-              onChange={(e) => setEmailValue(e.target.value)}
-            />
-            <Button
-              type="submit"
-              variant="outline"
-              className="h-12 md:h-14 lg:h-12 !bg-green-500/80 !text-semibold transition-all ease-in-out duration-150 hover:scale-105 hover:cursor-pointer hover:!bg-green-500 text-md lg:text-sm md:text-xl"
-              onClick={() => resendTokenAndOtp()}
-            >
-              {isLoading ? (
-                <ImSpinner8 className="text-2xl font-semibold animate-spin" />
-              ) : (
-                "Resend"
-              )}
-            </Button>
-          </div>
-        ) : (
-          <></>
-        )}
       </div>
     </div>
   );

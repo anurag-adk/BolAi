@@ -51,10 +51,17 @@ export default function VerifyPage() {
     //If Valid Call The Function
     const data = await regenerateToken({ email: emailValue });
     //If Error Show The Toast
-    if (!data.success) {
+    if (!data.success && data.type === "stay") {
       setIsLoading(false);
       setIsResendClicked(false);
       return toast.error(data.message);
+    }
+    //If Error Is Resend
+    if (!data.success && data.type === "resend") {
+      setIsLoading(false);
+      setIsResendClicked(false);
+      toast.error(data.message);
+      router.push("/signup");
     }
     //If Valid
     toast.success(data.message);
@@ -77,9 +84,15 @@ export default function VerifyPage() {
     //Call the verify function:
     const data = await checkAndVerify({ otpCode: otpValue, token });
     //If Error Show The Toast
-    if (!data.success) {
+    if (!data.success && data.type === "stay") {
       setIsLoading(false);
       return toast.error(data.message);
+    }
+    //If Error And Type Resend
+    if (!data.success && data.type === "resend") {
+      setIsLoading(false);
+      toast.error(data.message);
+      router.push("/signup");
     }
     //If Valid
     toast.success(data.message);
