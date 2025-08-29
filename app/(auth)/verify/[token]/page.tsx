@@ -50,22 +50,27 @@ export default function VerifyPage() {
     }
     //If Valid Call The Function
     const data = await regenerateToken({ email: emailValue });
+
+    setIsLoading(false);
+    setIsResendClicked(false);
+
     //If Error Show The Toast
     if (!data.success && data.type === "stay") {
-      setIsLoading(false);
-      setIsResendClicked(false);
       return toast.error(data.message);
     }
     //If Error Is Resend
     if (!data.success && data.type === "resend") {
-      setIsLoading(false);
-      setIsResendClicked(false);
       toast.error(data.message);
       router.push("/signup");
+      return; // Prevent further execution
     }
     //If Valid
-    toast.success(data.message);
-    router.push(`/verify/${data.token}`);
+    if (data.success) {
+      toast.success(data.message);
+      router.push(`/verify/${data.token}`);
+    } else {
+      toast.error(data.message || "Failed to resend OTP. Please try again.");
+    }
   };
   //Function To Verify The OTP
   const validateOtp = async () => {
@@ -83,20 +88,27 @@ export default function VerifyPage() {
     }
     //Call the verify function:
     const data = await checkAndVerify({ otpCode: otpValue, token });
+
+    setIsLoading(false);
+
     //If Error Show The Toast
     if (!data.success && data.type === "stay") {
-      setIsLoading(false);
       return toast.error(data.message);
     }
     //If Error And Type Resend
     if (!data.success && data.type === "resend") {
-      setIsLoading(false);
       toast.error(data.message);
       router.push("/signup");
+      return; // Prevent further execution
     }
-    //If Valid
-    toast.success(data.message);
-    router.push("/login");
+    //If Valid (only runs if success is true)
+    if (data.success) {
+      toast.success(data.message);
+      router.push("/login");
+    } else {
+      // Fallback for any other error cases
+      toast.error(data.message || "Verification failed. Please try again.");
+    }
   };
   return (
     <>

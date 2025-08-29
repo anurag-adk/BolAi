@@ -60,7 +60,7 @@ export async function regenerateToken(payload: TokenPayload) {
       .where("email", "==", payload.email)
       .limit(1)
       .get();
-    if (userRecord) {
+    if (!userRecord.empty) {
       return {
         success: true,
         type: "success",
@@ -76,7 +76,25 @@ export async function regenerateToken(payload: TokenPayload) {
         message: "Session expired. Sign up again to receive a new OTP.",
       };
     }
-    const userData = JSON.parse(userExists);
+
+    // Handle both string and object cases from Redis
+    let userData;
+    try {
+      if (typeof userExists === "string") {
+        userData = JSON.parse(userExists);
+      } else {
+        // If Redis returned an object directly, use it as-is
+        userData = userExists;
+      }
+    } catch (parseError) {
+      console.error("Redis data parsing error:", parseError);
+      console.error("Raw Redis data:", userExists);
+      return {
+        success: false,
+        type: "resend",
+        message: "Session data corrupted. Sign up again to receive a new OTP.",
+      };
+    }
 
     //Now Generate A New Otp For The User:
     const otp = await generateOtp();
@@ -134,6 +152,7 @@ export async function checkAndVerify(payload: verifyPayload) {
 
     //Check Whether The User Exists With The Provided Email:
     const userExists = (await redis.get(decodedData.email)) as string | null;
+
     if (!userExists) {
       return {
         success: false,
@@ -142,7 +161,25 @@ export async function checkAndVerify(payload: verifyPayload) {
           "Your session expired after 5 minutes. Please sign up again to continue.",
       };
     }
-    const userInfo = JSON.parse(userExists);
+
+    // Handle both string and object cases from Redis
+    let userInfo;
+    try {
+      if (typeof userExists === "string") {
+        userInfo = JSON.parse(userExists);
+      } else {
+        // If Redis returned an object directly, use it as-is
+        userInfo = userExists;
+      }
+    } catch (parseError) {
+      console.error("Redis data parsing error:", parseError);
+      console.error("Raw Redis data:", userExists);
+      return {
+        success: false,
+        type: "resend",
+        message: "Session data corrupted. Please sign up again.",
+      };
+    }
 
     //Check the rate whether it is exhausted:
     if (userInfo.rate === 0) {
@@ -159,6 +196,8 @@ export async function checkAndVerify(payload: verifyPayload) {
     const otp = parseInt(payload.otpCode, 10); //Provided Otp
     if (otp !== userInfo.otp!) {
       userInfo.rate -= 1;
+      // Update the rate in Redis
+      await redis.set(decodedData.email, JSON.stringify(userInfo), { ex: 300 });
       return {
         success: false,
         type: "stay",
@@ -196,6 +235,9 @@ export async function checkAndVerify(payload: verifyPayload) {
       receiver: userInfo.email,
       name: userInfo.name,
     });
+
+    // Clean up Redis data after successful verification
+    await redis.del(userInfo.email);
 
     //Success Response:
     return {

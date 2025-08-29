@@ -30,7 +30,7 @@ export const signup = async (params: signUpParams) => {
       .where("email", "==", email)
       .limit(1)
       .get();
-    if (userDBRecord) {
+    if (!userDBRecord.empty) {
       return {
         success: false,
         message: "The provided info already exists for an user",
@@ -185,8 +185,16 @@ export const getCurrentUser = async () => {
 };
 
 //This will help to fetch the generated interviews for the current user:
-export async function fetchGeneratedInterviews(userId: string) {
+export async function fetchGeneratedInterviews(
+  userId: string
+): Promise<any[] | null> {
   try {
+    // Validate userId parameter
+    if (!userId || userId === undefined || userId === null) {
+      console.error("fetchGeneratedInterviews: userId is undefined or null");
+      return null;
+    }
+
     const interviews = await db
       .collection("interviews")
       .where("userId", "==", userId)
@@ -200,11 +208,12 @@ export async function fetchGeneratedInterviews(userId: string) {
     const interviewData = interviews.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-    })) as [];
+    }));
     //Return The Array:
     return interviewData;
   } catch (error: any) {
     console.error("Error fetching interviews:", error.message || error);
+    console.error("userId provided:", userId);
     return null;
   }
 }
@@ -213,10 +222,19 @@ export async function fetchGeneratedInterviews(userId: string) {
 export async function fetchLatestGeneratedInterviews(params: {
   userId: string;
   limit: number;
-}) {
+}): Promise<any[] | null> {
   try {
     //Get The Values From Params:
     const { userId, limit = 20 } = params;
+
+    // Validate userId parameter
+    if (!userId || userId === undefined || userId === null) {
+      console.error(
+        "fetchLatestGeneratedInterviews: userId is undefined or null"
+      );
+      return null;
+    }
+
     const interviews = await db
       .collection("interviews")
       .orderBy("createdAt", "desc")
@@ -232,11 +250,13 @@ export async function fetchLatestGeneratedInterviews(params: {
     const interviewData = interviews.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
-    })) as [];
+    }));
     //Return the array:
     return interviewData;
   } catch (error: any) {
     console.error("Error Fetching Interviews:", error.message || error);
+    console.error("userId provided:", params?.userId);
+    console.error("limit provided:", params?.limit);
     return null;
   }
 }

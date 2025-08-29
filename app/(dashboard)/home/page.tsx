@@ -13,18 +13,33 @@ import {
 const HomePage = async () => {
   //Get Current User:
   const user = await getCurrentUser();
+
+  // Handle case where user is not authenticated or doesn't have an id
+  if (!user || !user.id) {
+    console.error("User not authenticated or missing id:", user);
+    // You might want to redirect to login page here
+    return (
+      <div className="w-full min-h-screen flex justify-center items-center">
+        <div className="text-white text-xl">
+          Please log in to access this page.
+        </div>
+      </div>
+    );
+  }
+
   //Parallel Data Fetching:
   const [userInterviews, communityInterviews] = await Promise.all([
     //Get The Current Users Interviews:
-    (await fetchGeneratedInterviews(user?.id as string)) as any[],
+    fetchGeneratedInterviews(user.id),
     //Get The Latest Interview From The Community:
-    (await fetchLatestGeneratedInterviews({
-      userId: user?.id as string,
+    fetchLatestGeneratedInterviews({
+      userId: user.id,
       limit: 20,
-    })) as any[],
+    }),
   ]);
-  const hasPastInterviews = userInterviews?.length > 0;
-  const hasPastCommunityInterviews = communityInterviews?.length > 0;
+  const hasPastInterviews = userInterviews && userInterviews.length > 0;
+  const hasPastCommunityInterviews =
+    communityInterviews && communityInterviews.length > 0;
   return (
     <div className="w-full min-h-screen flex flex-col justify-start items-center overflow-y-auto mt-4 px-5">
       {/* Banner And CTA */}
@@ -73,7 +88,7 @@ const HomePage = async () => {
         {/* Render The Interview Cards */}
         <div className="w-full flex flex-col justify-start items-center lg:flex-row lg:justify-between lg:items-start lg:flex-wrap lg:gap-4 mb-4">
           {hasPastInterviews ? (
-            userInterviews?.map((interview) => (
+            userInterviews?.map((interview: any) => (
               <InterviewCard key={interview?.id} {...interview} />
             ))
           ) : (
@@ -92,8 +107,8 @@ const HomePage = async () => {
         {/* Render The Interview Cards */}
         <div className="w-full flex flex-col justify-start items-center lg:flex-row lg:justify-between lg:items-start lg:flex-wrap lg:gap-4 mb-4 mt-2">
           {hasPastCommunityInterviews ? (
-            communityInterviews.map((interview) => (
-              <InterviewCard key={interview.id} {...(interview as any)} />
+            communityInterviews?.map((interview: any) => (
+              <InterviewCard key={interview?.id} {...interview} />
             ))
           ) : (
             <p className="text-left text-md md:text-lg lg:text-sm text-white">
