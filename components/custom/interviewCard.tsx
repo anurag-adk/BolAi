@@ -104,7 +104,13 @@ const InterviewCard = ({
         {/* Icons */}
         <div className="flex justify-start items-center">
           {techstack.map((techIcon) => (
-            <TechIcon techStack={techIcon} key={techIcon} />
+            <TechIcon
+              techStack={techIcon
+                .toLowerCase()
+                .replace(/\./g, "")
+                .replace(/\s+/g, "")}
+              key={techIcon}
+            />
           ))}
         </div>
         {/* Buttons */}

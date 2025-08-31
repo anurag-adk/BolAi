@@ -43,6 +43,8 @@ export async function POST(request: Request) {
       level,
       techstack: Array.isArray(techstack)
         ? techstack
+        : techstack.startsWith("[")
+        ? JSON.parse(techstack)
         : String(techstack)
             .split(",")
             .map((item) => item.trim()),
