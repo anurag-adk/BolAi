@@ -9,6 +9,7 @@ import {
   fetchLatestGeneratedInterviews,
   getCurrentUser,
 } from "@/lib/actions/auth.action";
+import { FaArrowRight } from "react-icons/fa";
 
 const HomePage = async () => {
   //Get Current User:
@@ -34,7 +35,7 @@ const HomePage = async () => {
     //Get The Latest Interview From The Community:
     fetchLatestGeneratedInterviews({
       userId: user.id,
-      limit: 20,
+      limit: 6,
     }),
   ]);
   const hasPastInterviews = userInterviews && userInterviews.length > 0;
@@ -101,8 +102,23 @@ const HomePage = async () => {
       </div>
       {/* Displaying the available Interviews */}
       <div className="w-[95%] md:w-[95%] lg:w-[90%] flex flex-col justify-start items-start mt-8 mb-4">
-        <div className="text-2xl md:text-3xl lg:text-2xl font-semibold text-white mb-4 md:mb-6 lg:mb-4">
-          Take an Interview
+        <div className="w-full p-2 flex justify-start items-center mb-4 md:mb-6 lg:mb-4">
+          {/* Title */}
+          <div className="text-2xl md:text-3xl lg:text-2xl font-semibold text-white mr-8">
+            Interview Hub
+          </div>
+          {/* View More CTA Button */}
+          <Button className="bg-green-600/80 h-[6.5vh] w-[38%] md:w-[38%] lg:w-[12.5%] rounded-md hover:cursor-pointer hover:bg-green-500/80 transition-all ease-in-out duration-150 hover:scale-105">
+            <Link
+              href="/interviewHub"
+              className="flex justify-center items-center"
+            >
+              <div className="font-semibold text-white mr-2 text-md md:text-xl lg:text-md">
+                View More
+              </div>
+              <FaArrowRight className="font-semibold text-white" />
+            </Link>
+          </Button>
         </div>
         {/* Render The Interview Cards */}
         <div className="w-full flex flex-col justify-start items-center lg:flex-row lg:justify-between lg:items-start lg:flex-wrap lg:gap-4 mb-4 mt-2">
