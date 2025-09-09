@@ -14,6 +14,8 @@ export const mappings: { [key: string]: string } = {
   angular: "angular",
   "svelte.js": "svelte",
   svelte: "svelte",
+  "solid.js": "solid",
+  solid: "solid",
 
   // Backend
   nodejs: "nodejs",
@@ -26,6 +28,12 @@ export const mappings: { [key: string]: string } = {
   laravel: "laravel",
   "spring boot": "spring",
   spring: "spring",
+  fastapi: "fast",
+  fast: "fast",
+  nestjs: "nest",
+  nest: "nest",
+  rails: "rails",
+  "ruby on rails": "rails",
 
   // Programming Languages
   javascript: "javascript",
@@ -45,6 +53,7 @@ export const mappings: { [key: string]: string } = {
   swift: "swift",
   go: "go",
   rust: "rust",
+  dart: "dart",
 
   // CSS Frameworks / Tools
   tailwindcss: "tailwind",
@@ -54,6 +63,7 @@ export const mappings: { [key: string]: string } = {
   scss: "sass",
   less: "less",
   css: "css",
+  postcss: "postcss",
 
   // Design Tools
   figma: "figma",
@@ -62,6 +72,7 @@ export const mappings: { [key: string]: string } = {
   sketch: "sketch",
   photoshop: "photoshop",
   illustrator: "illustrator",
+  framer: "framer",
 
   // Databases
   mongodb: "mongodb",
@@ -97,4 +108,24 @@ export const mappings: { [key: string]: string } = {
   cypress: "cypress",
   playwright: "playwright",
   selenium: "selenium",
+
+  //Data-Science
+  pandas: "pandas",
+  numpy: "numpy",
+  scikit: "sklearn",
+  "scikit-learn": "sklearn",
+  sklearn: "sklearn",
+  tensorflow: "tensorflow",
+  pytorch: "pytorch",
+  keras: "keras",
+  jupyter: "jupyter",
+  "jupyter notebook": "jupyter",
+
+  // Misc Tools
+  webpack: "webpack",
+  vite: "vite",
+  babel: "babel",
+  eslint: "eslint",
+  prettier: "prettier",
+  postman: "postman",
 };

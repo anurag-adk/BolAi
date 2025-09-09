@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 //Server Side Rendering
 "use server";
-
 //Imports
 import { auth, db } from "@/firebase/admin";
 import { cookies } from "next/headers";
 import { sendMail } from "../nodemailer";
 import redis from "../redisConfig";
+import { encryptPassword } from "../encryptDecrypt";
+import cloudinary from "../cloudinary";
 
 interface signUpParams {
   name: string;
@@ -19,6 +19,12 @@ interface signUpParams {
 interface signInParams {
   email: string;
   idToken: string;
+}
+
+interface updateParams {
+  id: string;
+  name: string;
+  profilePic?: File; //Optional
 }
 
 export const signup = async (params: signUpParams) => {
@@ -45,13 +51,15 @@ export const signup = async (params: signUpParams) => {
           "You have already created an account but have left to validate it.",
       };
     }
+    //Encrypt The Password And Store It In Redis:
+    const encryptedPassword = encryptPassword(password);
     //Store it in the redis db which expires in 5m:
     await redis.set(
       email,
       JSON.stringify({
         name,
         email,
-        password,
+        password: encryptedPassword,
         otp,
         rate: 5,
       }),
@@ -221,11 +229,11 @@ export async function fetchGeneratedInterviews(
 //This will help to fetch the generated interviews by the other users["Community"]:
 export async function fetchLatestGeneratedInterviews(params: {
   userId: string;
-  limit: number;
+  limit?: number; //optional
 }): Promise<any[] | null> {
   try {
     //Get The Values From Params:
-    const { userId, limit = 20 } = params;
+    const { userId, limit } = params;
 
     // Validate userId parameter
     if (!userId || userId === undefined || userId === null) {
@@ -235,13 +243,20 @@ export async function fetchLatestGeneratedInterviews(params: {
       return null;
     }
 
-    const interviews = await db
+    //If the user has provided the limit explictly then only the limit is applied:
+    let query = db
       .collection("interviews")
       .orderBy("createdAt", "desc")
       .where("finalized", "==", true)
-      .where("userId", "!=", userId)
-      .limit(limit)
-      .get();
+      .where("userId", "!=", userId);
+
+    if (limit && limit > 0) {
+      query = query.limit(limit);
+    }
+
+    //Execute the query:
+    const interviews = await query.get();
+
     //Check For The Fetched Interviews:
     if (interviews.docs.length === 0 || interviews.empty) {
       return null;
@@ -265,4 +280,119 @@ export async function fetchLatestGeneratedInterviews(params: {
 export const isAuthenticated = async () => {
   const user = await getCurrentUser();
   return !!user; //If Data Returns -> True Else False, If True then only get the value!
+};
+
+//This function will help the users to update their profile info:
+export const updateUserProfile = async (params: updateParams) => {
+  try {
+    //Check Whether The User Exists:
+    const userExists = await auth.getUser(params.id);
+    if (!userExists) {
+      return {
+        success: false,
+        message: "The loggedIn user doesn't exist in the platform.",
+      };
+    }
+    //Validate the provided params:
+    const nameRegex = /^(?=.{2,100}$)([A-Z][a-z]{1,})([ '-][A-Z][a-z]{1,})*$/;
+    if (!params.name.trim() || !nameRegex.test(params.name)) {
+      return {
+        success: false,
+        message:
+          "Invalid fullname. Use letters, spaces, hyphens or apostrophes. Start with capital letters.",
+      };
+    }
+    if (!params.id.trim()) {
+      return {
+        success: false,
+        message: "A valid user ID is required to perform the update operation.",
+      };
+    }
+    //Check If The Data Provided Matches The Previous Data:
+    const userDoc = await db.collection("users").doc(params.id).get();
+    const currentUserData = userDoc.data();
+    if (!currentUserData || !userDoc) {
+      return {
+        success: false,
+        message:
+          "We were unable to retrieve user information using the provided login credentials",
+      };
+    }
+    //Early Exit Logic:
+    const nameChanged = params.name !== currentUserData.name;
+    const imageProvided = params.profilePic && params.profilePic.size > 0;
+    if (!nameChanged && !imageProvided) {
+      return {
+        success: false,
+        message:
+          "No changes detected. Please provide new information to update your profile.",
+      };
+    }
+    //Build an object or change object:
+    const updatedData: any = {};
+    //If a new profilePic is provided:
+    if (params.profilePic && params.profilePic.size > 0) {
+      try {
+        // Convert File to Buffer for Cloudinary
+        const bytes = await params.profilePic.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        const base64String = `data:${
+          params.profilePic.type
+        };base64,${buffer.toString("base64")}`;
+        //Defining The Function To Extract The PublicId From The Secure_Url:
+        function getPublicIdFromUrl(url: string): string {
+          const match = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[^.]+$/);
+          return match ? match[1] : "";
+        }
+        //First Time Uploading a pic in the cloudinary:
+        if (!currentUserData?.profilePic) {
+          const result = await cloudinary.uploader.upload(base64String, {
+            resource_type: "auto",
+            folder: "bolai_profile_pics",
+            public_id: `user_${params.id}_${Date.now()}`,
+          });
+          updatedData.profilePic = result.secure_url;
+        } else {
+          //If Changing The Existing Profile Pic:
+          //1. Delete The Existing Picture
+          const publicId = getPublicIdFromUrl(currentUserData.profilePic);
+          await cloudinary.uploader.destroy(publicId, {
+            resource_type: "image",
+          });
+          //2. Upload The New Image:
+          const result = await cloudinary.uploader.upload(base64String, {
+            resource_type: "auto",
+            folder: "bolai_profile_pics",
+            public_id: `user_${params.id}_${Date.now()}`,
+          });
+          updatedData.profilePic = result.secure_url;
+        }
+      } catch (error) {
+        console.error(error);
+        return {
+          success: false,
+          message:
+            "Unable to update profile picture. An error occurred during upload.",
+        };
+      }
+    }
+    //Update The New Name If Provided:
+    if (currentUserData.name !== params.name) {
+      updatedData.name = params.name;
+    }
+    //Now Finally Updating The Data In The DB:
+    await db.collection("users").doc(params.id).update(updatedData);
+    //Send Response After Successful Update:
+    return {
+      success: true,
+      message: "User profile updated successfully.",
+    };
+  } catch (error: any) {
+    console.error(error.message || error);
+    return {
+      success: false,
+      message:
+        "Something went wrong while updating the profile. Please try again shortly.",
+    };
+  }
 };

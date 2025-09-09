@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 //Server Component:
 "use server";
 
@@ -11,6 +12,8 @@ import { sendMail } from "./nodemailer";
 import redis from "./redisConfig";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/client";
+import { auth as adminAuth } from "@/firebase/admin";
+import { decryptPassword } from "./encryptDecrypt";
 
 //Interface For The Payloads
 interface TokenPayload {
@@ -162,7 +165,7 @@ export async function checkAndVerify(payload: verifyPayload) {
       };
     }
 
-    // Handle both string and object cases from Redis
+    // Handle both string and object cases from Redis:
     let userInfo;
     try {
       if (typeof userExists === "string") {
@@ -181,20 +184,21 @@ export async function checkAndVerify(payload: verifyPayload) {
       };
     }
 
-    //Check the rate whether it is exhausted:
-    if (userInfo.rate === 0) {
-      await redis.del(decodedData.email);
-      return {
-        success: false,
-        type: "resend",
-        message:
-          "You've used all your verification attempts. Please sign up again to continue.",
-      };
-    }
-
     //Check the otp values:
     const otp = parseInt(payload.otpCode, 10); //Provided Otp
     if (otp !== userInfo.otp!) {
+      //Before Decrementing Check The Rate-Limiting Logic:
+      if (userInfo.rate === 1) {
+        //This is the last and you have exhausted all of the attempts to verify your account:
+        await redis.del(decodedData.email);
+        return {
+          success: false,
+          type: "resend",
+          message:
+            "Invalid OTP. You've exhausted all attempts. Please sign up again.",
+        };
+      }
+      //Decrease The Attempt:
       userInfo.rate -= 1;
       // Update the rate in Redis
       await redis.set(decodedData.email, JSON.stringify(userInfo), { ex: 300 });
@@ -206,6 +210,19 @@ export async function checkAndVerify(payload: verifyPayload) {
     }
 
     //If the otp is valid then generate a new user in the db:
+    //Check If The Authentication Is Already Created
+    try {
+      const isAuthCreated = await adminAuth.getUserByEmail(userInfo.email);
+      if (isAuthCreated) {
+        return {
+          success: false,
+          type: "stay",
+          message: "Account already exists. Please try logging in instead.",
+        };
+      }
+    } catch (error) {}
+    //Decrypt The Password Before Creating The Credentials:
+    userInfo.password = decryptPassword(userInfo.password);
     // Using The Firebase In-Built Function
     const userCredentials = await createUserWithEmailAndPassword(
       auth,
@@ -219,6 +236,7 @@ export async function checkAndVerify(payload: verifyPayload) {
       .set({
         name: userInfo.name,
         email: userInfo.email,
+        createdAt: new Date().toISOString(),
       });
     //Check If Creation Was Success
     if (!newUser) {

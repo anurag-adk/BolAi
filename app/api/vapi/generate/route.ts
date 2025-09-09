@@ -11,9 +11,21 @@ export async function GET() {
   });
 }
 
+//Defining The Interface For The Interview Object:
+interface Interview {
+  role: string; //Any As Defined By The User
+  type: "Technical" | "Behavioral" | "Mixed"; //Enum Values
+  level: "Entry" | "Mid" | "Senior"; //Enum Values
+  amount: string; //Alpha Numeric like: '4', '3'
+  userid: string; //Object Id coming from the firebase
+  imagePath: string; //URL of the image
+  techstack: string | string[]; //Array Of The Strings
+}
+
 export async function POST(request: Request) {
+  const requestData: Interview = await request.json();
   const { type, role, level, techstack, amount, userid, imagePath } =
-    await request.json();
+    requestData;
   try {
     const { text: questions } = await generateText({
       model: groq("llama-3.3-70b-versatile"),

@@ -154,12 +154,12 @@ const Sidebar = () => {
                     My Interviews
                   </a>
                   <a
-                    href="#"
+                    href="/interviewHub"
                     className="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
                     onClick={closeMobileMenu}
                   >
                     <AiOutlineRobot className="mr-3 text-lg" />
-                    Mock Interview
+                    Interview Hub
                   </a>
                 </div>
               </div>
