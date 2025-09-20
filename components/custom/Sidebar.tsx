@@ -258,7 +258,7 @@ const Sidebar = () => {
               </div>
             </div>
           </AlertDialogTrigger>
-          <AlertDialogContent className="bg-gray-800">
+          <AlertDialogContent className="bg-slate-900/70 backdrop-blur-md border border-slate-700/50">
             {/* Header Of Alert */}
             <AlertDialogHeader>
               <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
