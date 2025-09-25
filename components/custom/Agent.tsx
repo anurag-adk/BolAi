@@ -31,6 +31,7 @@ interface AiInterviewProps {
   userName: string;
   type: string;
   userId: string;
+  profilePic: string;
 }
 
 enum CallStatus {
@@ -45,7 +46,20 @@ interface SavedMessage {
   content: string;
 }
 
-const Agent = ({ userName, type, userId }: AiInterviewProps) => {
+type voiceId =
+  | "Rohan"
+  | "Neha"
+  | "Spencer"
+  | "Elliot"
+  | "Kylie"
+  | "Lily"
+  | "Savannah"
+  | "Hana"
+  | "Cole"
+  | "Harry"
+  | "Paige";
+
+const Agent = ({ userName, type, userId, profilePic }: AiInterviewProps) => {
   //useState Hook:
   const router = useRouter();
   const [speakingRole, setSpeakingRole] = useState<"user" | "assistant" | null>(
@@ -57,6 +71,7 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
     null
   );
   const latestMessage = messages[messages.length - 1]?.content;
+  const [voiceId, setVoiceId] = useState<voiceId>("Neha");
 
   //useEffect Hook executed in the initial mounting:
   useEffect(() => {
@@ -458,7 +473,6 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
     setCallStatus(CallStatus.CONNECTING);
 
     try {
-      // Pre-call microphone permission check
       try {
         console.log("🎤 Checking microphone permissions...");
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -485,6 +499,10 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
         variableValues: {
           username: userName,
           userid: userId,
+        },
+        voice: {
+          voiceId,
+          provider: "vapi",
         },
       });
       console.log("Vapi call initiated successfully");
@@ -523,6 +541,13 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
 
   const isCallInactiveOrFinished =
     callStatus === CallStatus.INACTIVE || callStatus === CallStatus.FINISHED;
+
+  //Getting The Initials
+  const initials = userName
+    ?.split(" ")
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
 
   return (
     <>
@@ -590,17 +615,29 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
               {speakingRole === "user" && (
                 <span className="absolute inline-flex h-full w-full rounded-[50%] sm:rounded-full border-6 border-blue-400/80 opacity-75 animate-ping transition-all ease-in-out duration-150"></span>
               )}
-              <div
-                className={`relative w-full h-full aspect-square rounded-[50%] bg-transparent ${
-                  speakingRole === "user" ? "opacity-95 animate-pulse" : ""
-                }`}
-                style={{
-                  backgroundImage: `url('/profile.png')`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                }}
-              ></div>
+              {profilePic ? (
+                <div
+                  className={`relative w-full h-full aspect-square rounded-[50%] bg-transparent ${
+                    speakingRole === "user" ? "opacity-95 animate-pulse" : ""
+                  }`}
+                  style={{
+                    backgroundImage: `url(${profilePic})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat",
+                  }}
+                ></div>
+              ) : (
+                <div
+                  className={`relative  w-full h-full aspect-square rounded-[50%] bg-gradient-to-r from-blue-500/80 via-cyan-500/80 to-indigo-500/80 flex justify-center items-center ${
+                    speakingRole === "user" ? "opacity-95 animate-pulse" : ""
+                  }`}
+                >
+                  <div className="text-2xl font-semibold text-white">
+                    {initials}
+                  </div>
+                </div>
+              )}
             </div>
             <div className="text-3xl lg:text-2xl font-semibold text-white mt-4 mb-2">
               {userName}
@@ -678,6 +715,7 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
                             <div
                               key={voice.name}
                               className="bg-transparent p-3 mt-2 rounded-md w-full flex flex-col justify-start items-start gap-y-4 transition-all duration-150 hover:bg-gray-800/80 hover:cursor-pointer"
+                              onClick={() => setVoiceId(voice.name as voiceId)}
                             >
                               {/* Div for Image, Name And Audio */}
                               <div className="w-full flex justify-start items-center gap-x-4 flex-wrap gap-y-2">

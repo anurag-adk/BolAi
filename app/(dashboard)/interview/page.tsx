@@ -8,7 +8,12 @@ const InterviewPage = async () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col justify-start items-center overflow-auto">
-      <Agent userName={userName} userId={user?.id ?? ""} type="generate" />
+      <Agent
+        userName={userName}
+        userId={user?.id ?? ""}
+        type="generate"
+        profilePic={user?.profilePic ?? ""}
+      />
     </div>
   );
 };

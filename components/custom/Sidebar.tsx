@@ -244,11 +244,23 @@ const Sidebar = () => {
           <AlertDialogTrigger className="hover:cursor-pointer transition-all ease-in-out duration-150 hover:bg-gray-700/40">
             <div className="p-4 border-t border-gray-700 flex-shrink-0 flex justify-start items-center">
               <div className="flex justify-start items-center space-x-3">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center ml-2">
-                  <span className="text-sm font-medium text-white">
-                    {user?.name ? getInitials(user.name) : "U"}
-                  </span>
-                </div>
+                {user?.profilePic ? (
+                  <div
+                    className="w-8 h-8 rounded-full ml-2"
+                    style={{
+                      backgroundImage: `url(${user.profilePic})`,
+                      backgroundPosition: "center",
+                      backgroundRepeat: "no-repeat",
+                      backgroundSize: "cover",
+                    }}
+                  ></div>
+                ) : (
+                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center ml-2">
+                    <span className="text-sm font-medium text-white">
+                      {user?.name ? getInitials(user.name) : "U"}
+                    </span>
+                  </div>
+                )}
                 <div className="flex-1 ml-2 flex flex-col justify-start items-start">
                   <p className="text-sm font-medium text-white">
                     {user?.name || "User"}
