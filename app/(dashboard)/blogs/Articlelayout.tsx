@@ -13,7 +13,7 @@ export default function ArticleLayout({
   blog,
   children,
   backHref = "/blogs",
-  backLabel = "Back to Blogs",
+  backLabel = "Back to blogs",
 }: ArticleLayoutProps) {
   const dateLabel = blog.date
     ? new Intl.DateTimeFormat("en-US", {
@@ -24,12 +24,12 @@ export default function ArticleLayout({
     : null;
 
   return (
-    <div className="bg-gray-900">
-      <article className="max-w-3xl mx-auto p-4 text-gray-200 ">
+    <div className="bg-gray-900 mt-6 flex flex-col justify-start items-start">
+      <article className="max-w-3xl mx-auto p-4 md:p-6 lg:p-4 text-gray-200 flex flex-col justify-start items-start gap-y-4 text-justify">
         {/* Back link  */}
         <Link
           href={backHref}
-          className="mb-4 inline-flex items-center text-sm md:text-base font-medium text-gray-300 hover:text-green-300 transition-colors group"
+          className="mb-4 inline-flex items-center text-sm md:text-base font-medium text-gray-300 hover:text-green-300 transition-colors group mt-4 hover:underline"
         >
           <span className="mr-2 h-6 w-6 rounded-full bg-green-600/30 border border-green-500/40 flex items-center justify-center group-hover:bg-green-600/60 group-hover:scale-95 transition">
             <svg
@@ -47,22 +47,25 @@ export default function ArticleLayout({
           </span>
           {backLabel}
         </Link>
-
+        {/* Blog Title */}
+        <h1 className="text-3xl font-bold mb-2 mt-2">{blog.title}</h1>
+        {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-4">
           {blog.tags.map((tag) => (
             <span
               key={tag}
-              className="px-2 py-0.5 text-[10px] uppercase bg-green-900/25 text-green-300 rounded"
+              className="px-2 py-0.5 text-[12px] md:text-[14px] lg:text-[10px] uppercase bg-green-900/25 text-green-300 rounded"
             >
               {tag}
             </span>
           ))}
         </div>
-        <h1 className="text-3xl font-bold mb-2">{blog.title}</h1>
-        <div className="flex justify-between text-gray-400 text-sm mb-4">
-          {dateLabel && <span>{dateLabel}</span>}
+        {/* Date And Time */}
+        <div className="flex justify-start items-center text-gray-400 text-sm mb-4">
+          {dateLabel && <span className="mr-4">{dateLabel}</span>}
           <span>{blog.readingTime} min read</span>
         </div>
+        {/* Blog Pictures */}
         <div className="relative w-full aspect-[16/9] mb-6">
           <Image
             src={blog.cover}
@@ -72,7 +75,16 @@ export default function ArticleLayout({
             className="object-cover rounded"
           />
         </div>
+        {/* The Blog Content */}
         <div className="text-gray-300 space-y-4">{children}</div>
+        {/* Copyright */}
+        <div className="w-full flex justify-center items-center mt-4 mb-2">
+          <div className="text-sm text-white">
+            {" "}
+            &copy; 2025 BolAi. Blogs are contributed for educational and
+            informational purposes only. All rights reserved.
+          </div>
+        </div>
       </article>
     </div>
   );

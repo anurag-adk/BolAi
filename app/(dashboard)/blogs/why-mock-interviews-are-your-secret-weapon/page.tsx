@@ -116,7 +116,7 @@ export default function Page() {
         </p>
 
         {/* References */}
-        <div className="mt-10 border-t border-white/10 pt-6">
+        <div className="mt-10 border-t border-white/10 pt-6 mb-4">
           <h3 className="text-sm uppercase tracking-wide text-gray-400 mb-3">
             References
           </h3>

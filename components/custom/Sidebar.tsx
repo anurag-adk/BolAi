@@ -179,7 +179,7 @@ const Sidebar = () => {
                     Get Started
                   </a>
                   <a
-                    href="#"
+                    href="/blogs"
                     className="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
                     onClick={closeMobileMenu}
                   >

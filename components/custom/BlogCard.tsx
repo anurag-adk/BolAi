@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 
 export type Blog = {
   slug: string;
@@ -27,49 +26,54 @@ const BlogCard = ({ blog }: BlogCardProps) => {
   return (
     <Link
       href={`/blogs/${blog.slug}`}
-      className="group relative w-full rounded-lg border border-gray-700 bg-gray-800/50 hover:bg-gray-800 transition-colors flex flex-col overflow-hidden"
+      className="w-full md:w-[95%] h-[58vh] md:h-[52vh] lg:w-[30%] lg:h-[58vh] rounded-lg bg-black/60 hover:bg-gray-800 transition-all duration-150 ease-in-out aspect-square flex flex-col justify-start items-start gap-y-2 hover:scale-105 shadow-lg shadow-green-500/60 hover:shadow-none"
     >
-      {/* Cover Photo*/}
-      <div className="relative w-full aspect-[16/9]">
-        <Image
-          src={blog.cover}
-          alt={blog.title}
-          fill
-          unoptimized
-          className="object-cover"
-           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-        />
-        <span className="absolute bottom-2 right-2 px-2 py-0.5 text-[10px] bg-black/60 text-gray-300 rounded">
-          {blog.readingTime} min read
-        </span>
-      </div>
+      {/* The Cover Image */}
+      <div
+        className="w-full h-7/15 rounded-t-md"
+        style={{
+          backgroundImage: `url(${blog.cover})`,
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+        }}
+      ></div>
 
-      {/* Content */}
-      <div className="flex flex-col flex-1 p-4">
-        <div className="flex flex-wrap gap-2 mb-2">
+      {/* Tags, Content & Date-Time */}
+      <div className="w-full flex flex-col justify-evenly items-center gap-y-1.5">
+        {/* Tags */}
+        <div className="w-full flex justify-center items-center flex-wrap gap-x-1">
           {blog.tags.map((tag) => (
-            <span
+            <div
               key={tag}
-              className="px-2 py-0.5 text-[10px] uppercase bg-green-900/25 text-green-300 rounded"
+              className="px-2 py-0.5 text-[12px] md:text-[14px] lg:text-[10px] uppercase bg-green-900/25 text-green-300 rounded mb-1"
             >
               {tag}
-            </span>
+            </div>
           ))}
         </div>
+        {/* Content */}
+        <div className="w-full flex flex-col flex-1 p-4 gap-y-2">
+          <h3 className="text-white text-md font-semibold line-clamp-2 text-center text-lg md:text-xl lg:text-sm">
+            {blog.title}
+          </h3>
 
-        <h3 className="text-white text-lg font-semibold mb-1 line-clamp-2">
-          {blog.title}
-        </h3>
-
-        {blog.excerpt && (
-          <p className="text-gray-300 text-sm line-clamp-3 mb-3">
-            {blog.excerpt}
-          </p>
-        )}
-
-        <div className="mt-auto flex justify-between text-xs text-gray-400">
-          <span>{dateLabel}</span>
-          <span>{blog.readingTime} min read</span>
+          {blog.excerpt && (
+            <p className="text-gray-300 text-md md:text-lg lg:text-sm line-clamp-2 text-justify md:text-center lg:text-justify p-0.5">
+              {blog.excerpt}
+            </p>
+          )}
+        </div>
+        {/* Date And Time */}
+        <div className="w-full flex flex-row justify-center items-center p-1 mb-2">
+          {/* Date */}
+          <div className="px-2 py-0.5 text-[12px] md:text-[14px] lg:text-[10px] uppercase bg-orange-400/75 text-white rounded mr-2">
+            {dateLabel}
+          </div>
+          {/* Time */}
+          <div className="px-2 py-0.5 text-[12px] md:text-[14px] lg:text-[10px] uppercase bg-slate-400/75 text-white rounded">
+            {blog.readingTime} min read
+          </div>
         </div>
       </div>
     </Link>
