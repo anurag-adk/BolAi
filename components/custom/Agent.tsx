@@ -8,7 +8,6 @@ import { FiMessageCircle } from "react-icons/fi";
 import { RiMicAiLine } from "react-icons/ri";
 import { useRouter } from "next/navigation";
 import { vapi } from "@/lib/vapi.sdk";
-import Head from "next/head";
 
 //ShadCn Components:
 import {
@@ -551,9 +550,6 @@ const Agent = ({ userName, type, userId, profilePic }: AiInterviewProps) => {
 
   return (
     <>
-      <Head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      </Head>
       <div className="w-full flex flex-col justify-start items-center">
         {/* Title Of The Component */}
         <div className="w-[95%] lg:w-[80%] flex justify-center lg:justify-start mb-[2rem] md:mb-[2rem] lg:mb-[3rem] text-3xl md:text-4xl lg:text-3xl font-bold text-white mt-[2rem] ">
@@ -605,7 +601,7 @@ const Agent = ({ userName, type, userId, profilePic }: AiInterviewProps) => {
           </div>
           {/* User Interview Card */}
           <div
-            className={`max-sm:hidden lg:w-[40%] md:w-[82%] h-[55vh] md:h-[48vh] lg:h-[48vh] transition-all ease-in-out duration-300 bg-transparent flex flex-col justify-center items-center rounded-md border-2 ${
+            className={`max-sm:hidden lg:w-[40%] md:w-[82%] h-[55vh] md:h-[48vh] lg:h-[48vh] transition-all ease-in-out duration-300 bg-transparent flex flex-col justify-center items-center rounded-md border-2 backdrop-blur-md ${
               speakingRole === "user"
                 ? "border-blue-500 bg-neutral-900 scale-105 shadow-lg shadow-blue-500/30"
                 : "border-white/50"
@@ -629,7 +625,7 @@ const Agent = ({ userName, type, userId, profilePic }: AiInterviewProps) => {
                 ></div>
               ) : (
                 <div
-                  className={`relative  w-full h-full aspect-square rounded-[50%] bg-gradient-to-r from-blue-500/80 via-cyan-500/80 to-indigo-500/80 flex justify-center items-center ${
+                  className={`relative  w-full h-full aspect-square rounded-[50%] bg-gradient-to-br from-blue-400/80 via-cyan-400/80 to-indigo-400/80 shadow-sm shadow-blue-500/80 flex justify-center items-center ${
                     speakingRole === "user" ? "opacity-95 animate-pulse" : ""
                   }`}
                 >
