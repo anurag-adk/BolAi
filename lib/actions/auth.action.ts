@@ -27,6 +27,15 @@ interface updateParams {
   profilePic?: File; //Optional
 }
 
+//Exporting the user value:
+export type User = {
+  id: string;
+  name: string;
+  profilePic?: string; //optional can't be available all the time.
+  createdAt: string;
+  email: string;
+};
+
 export const signup = async (params: signUpParams) => {
   const { name, email, password, otp } = params;
   try {
@@ -183,7 +192,7 @@ export const getCurrentUser = async () => {
     if (!userRecord.exists) return null;
     //If userRecord Exists:
     return {
-      ...userRecord.data(),
+      ...(userRecord.data() as Omit<User, "id">),
       id: userRecord.id,
     };
   } catch (e) {

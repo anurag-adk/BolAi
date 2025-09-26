@@ -84,7 +84,7 @@ const HomePage = async () => {
       {/* Displaying the users Interviews */}
       <div className="w-[95%] md:w-[95%] lg:w-[90%] flex flex-col justify-start items-start mt-8 mb-4">
         <div className="text-2xl md:text-3xl lg:text-2xl font-semibold text-white mb-4 md:mb-6 lg:mb-4">
-          Your Interviews
+          My Interviews
         </div>
         {/* Render The Interview Cards */}
         <div className="w-full flex flex-col justify-start items-center lg:flex-row lg:justify-between lg:items-start lg:flex-wrap lg:gap-4 mb-4">
@@ -113,7 +113,7 @@ const HomePage = async () => {
               href="/interviewHub"
               className="flex justify-center items-center"
             >
-              <div className="font-semibold text-white mr-2 text-md md:text-xl lg:text-md">
+              <div className="font-semibold text-white mr-2 text-md md:text-xl lg:text-sm">
                 View More
               </div>
               <FaArrowRight className="font-semibold text-white" />

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+//React Components:
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { getCurrentUser, clearSessionCookie } from "@/lib/actions/auth.action";
 import {
@@ -33,6 +34,7 @@ import { toast } from "sonner";
 
 //For Navigation
 import { redirect } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 interface User {
   id: string;
@@ -44,6 +46,13 @@ interface User {
 const Sidebar = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  //Constant for routing:
+  const pathname = usePathname();
+
+  // Refs for scroll automation
+  const navRefs = useRef<{ [key: string]: HTMLAnchorElement | null }>({});
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -57,6 +66,25 @@ const Sidebar = () => {
 
     fetchUser();
   }, []);
+
+  // Auto-scroll to active item when pathname changes
+  useEffect(() => {
+    const activeRef = navRefs.current[pathname];
+    if (activeRef && scrollContainerRef.current) {
+      setTimeout(() => {
+        activeRef.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+          inline: "nearest",
+        });
+      }, 100); // Small delay to ensure DOM is updated
+    }
+  }, [pathname]);
+
+  // Function to set refs for navigation items
+  const setNavRef = (path: string) => (el: HTMLAnchorElement | null) => {
+    navRefs.current[path] = el;
+  };
 
   // Get user initials for avatar
   const getInitials = (name?: string) => {
@@ -117,6 +145,7 @@ const Sidebar = () => {
 
         {/* Scrollable Content Container */}
         <div
+          ref={scrollContainerRef}
           className="flex-1 overflow-y-auto custom-scrollbar"
           onWheel={(e) => e.stopPropagation()}
         >
@@ -129,38 +158,65 @@ const Sidebar = () => {
                   Interview Prep
                 </h3>
                 <div className="space-y-1">
-                  <a
+                  {/* My Feedbacks Tab */}
+                  <Link
+                    ref={setNavRef("/home")}
                     href="/home"
-                    className="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
+                    className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
+                      pathname === "/home"
+                        ? "text-white bg-gradient-to-r from-green-500/80 via-teal-500/80 to-emerald-500/80 py-3.5 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/80 scale-105"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
+                    }`}
                     onClick={closeMobileMenu}
                   >
                     <AiOutlineBarChart className="mr-3 text-lg" />
                     My Feedbacks
-                  </a>
-                  <a
+                  </Link>
+
+                  {/* Generate Interview */}
+                  <Link
+                    ref={setNavRef("/interview")}
                     href="/interview"
-                    className="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
+                    className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
+                      pathname === "/interview"
+                        ? "text-white bg-gradient-to-r from-green-500/80 via-teal-500/80 to-emerald-500/80 py-3.5 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/80 scale-105"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
+                    }`}
                     onClick={closeMobileMenu}
                   >
                     <AiOutlineMessage className="mr-3 text-lg" />
                     Generate Interview
-                  </a>
-                  <a
-                    href="#"
-                    className="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
+                  </Link>
+
+                  {/* My Interviews */}
+                  <Link
+                    ref={setNavRef("/my-interviews")}
+                    href="/my-interviews"
+                    className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
+                      pathname === "/my-interviews"
+                        ? "text-white bg-gradient-to-r from-green-500/80 via-teal-500/80 to-emerald-500/80 py-3.5 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/80 scale-105"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
+                    }`}
                     onClick={closeMobileMenu}
                   >
                     <AiOutlineHistory className="mr-3 text-lg" />
                     My Interviews
-                  </a>
-                  <a
+                  </Link>
+
+                  {/* Interview Hub */}
+                  <Link
+                    ref={setNavRef("/interviewHub")}
                     href="/interviewHub"
-                    className="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
+                    className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
+                      pathname === "/interviewHub"
+                        ? "text-white bg-gradient-to-r from-green-500/80 via-teal-500/80 to-emerald-500/80 py-3.5 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/80 scale-105"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
+                    }`}
                     onClick={closeMobileMenu}
                   >
                     <AiOutlineRobot className="mr-3 text-lg" />
                     Interview Hub
-                  </a>
+                  </Link>
                 </div>
               </div>
 
@@ -170,22 +226,35 @@ const Sidebar = () => {
                   Learning Center
                 </h3>
                 <div className="space-y-1">
-                  <a
-                    href="#"
-                    className="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
+                  {/* Get Started */}
+                  <Link
+                    ref={setNavRef("/get-started")}
+                    href="/get-started"
+                    className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
+                      pathname === "/get-started"
+                        ? "text-white bg-gradient-to-r from-green-500/80 via-teal-500/80 to-emerald-500/80 py-3.5 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/80 scale-105"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
+                    }`}
                     onClick={closeMobileMenu}
                   >
                     <AiOutlineQuestionCircle className="mr-3 text-lg" />
                     Get Started
-                  </a>
-                  <a
+                  </Link>
+
+                  {/* Blogs */}
+                  <Link
+                    ref={setNavRef("/blogs")}
                     href="/blogs"
-                    className="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
+                    className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
+                      pathname === "/blogs"
+                        ? "text-white bg-gradient-to-r from-green-500/80 via-teal-500/80 to-emerald-500/80 py-3.5 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/80 scale-105"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
+                    }`}
                     onClick={closeMobileMenu}
                   >
                     <AiOutlineBook className="mr-3 text-lg" />
                     Blogs
-                  </a>
+                  </Link>
                 </div>
               </div>
 
@@ -195,22 +264,35 @@ const Sidebar = () => {
                   Account
                 </h3>
                 <div className="space-y-1">
+                  {/* My Profile */}
                   <Link
+                    ref={setNavRef("/profile")}
                     href="/profile"
-                    className="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
+                    className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
+                      pathname === "/profile"
+                        ? "text-white bg-gradient-to-r from-green-500/80 via-teal-500/80 to-emerald-500/80 py-3.5 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/80 scale-105"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
+                    }`}
                     onClick={closeMobileMenu}
                   >
                     <AiOutlineUser className="mr-3 text-lg" />
                     My Profile
                   </Link>
-                  <a
+
+                  {/* Subscription */}
+                  <Link
+                    ref={setNavRef("/subscription")}
                     href="/subscription"
-                    className="flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
+                    className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
+                      pathname === "/subscription"
+                        ? "text-white bg-gradient-to-r from-green-500/80 via-teal-500/80 to-emerald-500/80 py-3.5 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/80 scale-105"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
+                    }`}
                     onClick={closeMobileMenu}
                   >
                     <AiOutlineCreditCard className="mr-3 text-lg" />
                     Subscription
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -218,7 +300,6 @@ const Sidebar = () => {
         </div>
 
         {/* Free Plan Card */}
-        {/* REMAINING: Check Free status from profile anf show the card only if free plan*/}
         <div className="p-4 flex-shrink-0">
           <div className="bg-gray-700/50 border border-gray-600 rounded-lg p-4">
             <div className="flex items-center mb-3">
@@ -244,11 +325,23 @@ const Sidebar = () => {
           <AlertDialogTrigger className="hover:cursor-pointer transition-all ease-in-out duration-150 hover:bg-gray-700/40">
             <div className="p-4 border-t border-gray-700 flex-shrink-0 flex justify-start items-center">
               <div className="flex justify-start items-center space-x-3">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center ml-2">
-                  <span className="text-sm font-medium text-white">
-                    {user?.name ? getInitials(user.name) : "U"}
-                  </span>
-                </div>
+                {user?.profilePic ? (
+                  <div
+                    className="w-8 h-8 rounded-full ml-2"
+                    style={{
+                      backgroundImage: `url(${user.profilePic})`,
+                      backgroundPosition: "center",
+                      backgroundRepeat: "no-repeat",
+                      backgroundSize: "cover",
+                    }}
+                  ></div>
+                ) : (
+                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center ml-2">
+                    <span className="text-sm font-medium text-white">
+                      {user?.name ? getInitials(user.name) : "U"}
+                    </span>
+                  </div>
+                )}
                 <div className="flex-1 ml-2 flex flex-col justify-start items-start">
                   <p className="text-sm font-medium text-white">
                     {user?.name || "User"}
@@ -258,7 +351,7 @@ const Sidebar = () => {
               </div>
             </div>
           </AlertDialogTrigger>
-          <AlertDialogContent className="bg-gray-800">
+          <AlertDialogContent className="bg-slate-900/70 backdrop-blur-md border border-slate-700/50">
             {/* Header Of Alert */}
             <AlertDialogHeader>
               <AlertDialogTitle>Confirm Logout</AlertDialogTitle>

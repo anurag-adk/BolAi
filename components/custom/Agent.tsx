@@ -5,14 +5,32 @@ import React, { useEffect, useState } from "react";
 import { MdCallEnd, MdCall } from "react-icons/md";
 import { ImSpinner8 } from "react-icons/im";
 import { FiMessageCircle } from "react-icons/fi";
+import { RiMicAiLine } from "react-icons/ri";
 import { useRouter } from "next/navigation";
 import { vapi } from "@/lib/vapi.sdk";
-import Head from "next/head";
+
+//ShadCn Components:
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+//Constant:
+import { voices } from "@/constants/voices";
+import AudioPlayer from "./audioPlayer";
 
 interface AiInterviewProps {
   userName: string;
   type: string;
   userId: string;
+  profilePic: string;
 }
 
 enum CallStatus {
@@ -27,7 +45,20 @@ interface SavedMessage {
   content: string;
 }
 
-const Agent = ({ userName, type, userId }: AiInterviewProps) => {
+type voiceId =
+  | "Rohan"
+  | "Neha"
+  | "Spencer"
+  | "Elliot"
+  | "Kylie"
+  | "Lily"
+  | "Savannah"
+  | "Hana"
+  | "Cole"
+  | "Harry"
+  | "Paige";
+
+const Agent = ({ userName, type, userId, profilePic }: AiInterviewProps) => {
   //useState Hook:
   const router = useRouter();
   const [speakingRole, setSpeakingRole] = useState<"user" | "assistant" | null>(
@@ -39,6 +70,7 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
     null
   );
   const latestMessage = messages[messages.length - 1]?.content;
+  const [voiceId, setVoiceId] = useState<voiceId>("Neha");
 
   //useEffect Hook executed in the initial mounting:
   useEffect(() => {
@@ -440,7 +472,6 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
     setCallStatus(CallStatus.CONNECTING);
 
     try {
-      // Pre-call microphone permission check
       try {
         console.log("🎤 Checking microphone permissions...");
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -467,6 +498,10 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
         variableValues: {
           username: userName,
           userid: userId,
+        },
+        voice: {
+          voiceId,
+          provider: "vapi",
         },
       });
       console.log("Vapi call initiated successfully");
@@ -506,11 +541,15 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
   const isCallInactiveOrFinished =
     callStatus === CallStatus.INACTIVE || callStatus === CallStatus.FINISHED;
 
+  //Getting The Initials
+  const initials = userName
+    ?.split(" ")
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
+
   return (
     <>
-      <Head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      </Head>
       <div className="w-full flex flex-col justify-start items-center">
         {/* Title Of The Component */}
         <div className="w-[95%] lg:w-[80%] flex justify-center lg:justify-start mb-[2rem] md:mb-[2rem] lg:mb-[3rem] text-3xl md:text-4xl lg:text-3xl font-bold text-white mt-[2rem] ">
@@ -562,7 +601,7 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
           </div>
           {/* User Interview Card */}
           <div
-            className={`max-sm:hidden lg:w-[40%] md:w-[82%] h-[55vh] md:h-[48vh] lg:h-[48vh] transition-all ease-in-out duration-300 bg-transparent flex flex-col justify-center items-center rounded-md border-2 ${
+            className={`max-sm:hidden lg:w-[40%] md:w-[82%] h-[55vh] md:h-[48vh] lg:h-[48vh] transition-all ease-in-out duration-300 bg-transparent flex flex-col justify-center items-center rounded-md border-2 backdrop-blur-md ${
               speakingRole === "user"
                 ? "border-blue-500 bg-neutral-900 scale-105 shadow-lg shadow-blue-500/30"
                 : "border-white/50"
@@ -572,17 +611,29 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
               {speakingRole === "user" && (
                 <span className="absolute inline-flex h-full w-full rounded-[50%] sm:rounded-full border-6 border-blue-400/80 opacity-75 animate-ping transition-all ease-in-out duration-150"></span>
               )}
-              <div
-                className={`relative w-full h-full aspect-square rounded-[50%] bg-transparent ${
-                  speakingRole === "user" ? "opacity-95 animate-pulse" : ""
-                }`}
-                style={{
-                  backgroundImage: `url('/profile.png')`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                }}
-              ></div>
+              {profilePic ? (
+                <div
+                  className={`relative w-full h-full aspect-square rounded-[50%] bg-transparent ${
+                    speakingRole === "user" ? "opacity-95 animate-pulse" : ""
+                  }`}
+                  style={{
+                    backgroundImage: `url(${profilePic})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat",
+                  }}
+                ></div>
+              ) : (
+                <div
+                  className={`relative  w-full h-full aspect-square rounded-[50%] bg-gradient-to-br from-blue-400/80 via-cyan-400/80 to-indigo-400/80 shadow-sm shadow-blue-500/80 flex justify-center items-center ${
+                    speakingRole === "user" ? "opacity-95 animate-pulse" : ""
+                  }`}
+                >
+                  <div className="text-2xl font-semibold text-white">
+                    {initials}
+                  </div>
+                </div>
+              )}
             </div>
             <div className="text-3xl lg:text-2xl font-semibold text-white mt-4 mb-2">
               {userName}
@@ -626,33 +677,156 @@ const Agent = ({ userName, type, userId }: AiInterviewProps) => {
           </div>
         )}
         {/* The Action Button */}
-        {callStatus !== "ACTIVE" ? (
-          <div
-            className={`fixed bottom-4 right-6 w-[20%] md:w-[16%] h-[10.25vh] lg:w-[5%] lg:h-[9vh] rounded-md flex justify-center items-center text-white text-lg transition-all ease-in-out duration-150 hover:scale-110 aspect-square hover:cursor-pointer mb-[2rem] ${
-              callStatus === "CONNECTING"
-                ? "animate-pulse bg-blue-800/80 hover:bg-blue-800/90 border-gray-300/80"
-                : "bg-green-500/80 hover:bg-green-500/90 border-1 border-gray-300/80"
-            }`}
-            onClick={handleCall}
-          >
-            {isCallInactiveOrFinished ? (
-              <>
-                <MdCall className="text-3xl lg:text-3xl md:text-5xl text-white font-semibold mr-0.5" />
-              </>
-            ) : (
-              <>
-                <ImSpinner8 className="text-3xl lg:text-3xl md:text-5xl text-white font-semibold mr-0.5 animate-spin" />
-              </>
-            )}
-          </div>
-        ) : (
-          <div
-            className="fixed bottom-4 right-6 w-[20%] md:w-[16%] h-[10.25vh] lg:w-[5%] lg:h-[9vh] rounded-md bg-rose-600/90 flex justify-center items-center transition-all ease-in-out duration-150 hover:cursor-pointer hover:scale-105 hover:bg-rose-600/80 border-1 border-gray-300/80 mb-[2rem]"
-            onClick={handleDisconnect}
-          >
-            <MdCallEnd className="text-3xl lg:text-3xl md:text-5xl text-white font-semibold mr-0.5" />
-          </div>
-        )}
+        <div className="fixed bottom-6 flex justify-center gap-4 w-full md:w-[65%] lg:w-[78%] px-0 py-0 lg:px-2 lg:py-2">
+          {callStatus !== "ACTIVE" ? (
+            <>
+              {callStatus !== "CONNECTING" ? (
+                <>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      {/* Alert Trigger */}
+                      <div className="w-[28.5%] md:w-[28.5%] h-[9.5vh] lg:w-[14.5%] lg:h-[7.5vh] rounded-md flex justify-center items-center text-white text-lg transition-all ease-in-out duration-150 hover:scale-110 aspect-square hover:cursor-pointer mr-6 bg-gradient-to-r from-slate-700/90 via-slate-800/90 to-slate-900/90 hover:from-slate-600/95 hover:via-slate-700/95 hover:to-slate-800/95 border-1 border-emerald-400/60 shadow-md shadow-emerald-400/30 ">
+                        <RiMicAiLine className="text-4xl lg:text-3xl md:text-6xl text-white font-semibold mr-0 lg:mr-2" />
+                        <div className="lg:text-[1rem] font-semibold text-white max-sm:hidden md:hidden lg:block">
+                          Select Voice
+                        </div>
+                      </div>
+                    </AlertDialogTrigger>
+                    {/* The body of the alert:  */}
+                    <AlertDialogContent className="bg-slate-900/70 backdrop-blur-md border border-slate-700/50">
+                      {/* The Header of the alert: */}
+                      <AlertDialogHeader className="px-4 pt-4">
+                        <AlertDialogTitle>Choose a Voice</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Personalize the interview by picking the voice you’d
+                          like to hear.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      {/* Making The Content Scrollable */}
+                      <ScrollArea className="h-[55vh] px-4">
+                        <div className="space-y-2 pb-4 gap-y-4 flex flex-col justify-start items-start w-full">
+                          {/* Now adding the options: */}
+                          {voices.map((voice) => (
+                            // Main Div
+                            <div
+                              key={voice.name}
+                              className="bg-transparent p-3 mt-2 rounded-md w-full flex flex-col justify-start items-start gap-y-4 transition-all duration-150 hover:bg-gray-800/80 hover:cursor-pointer"
+                              onClick={() => setVoiceId(voice.name as voiceId)}
+                            >
+                              {/* Div for Image, Name And Audio */}
+                              <div className="w-full flex justify-start items-center gap-x-4 flex-wrap gap-y-2">
+                                {/* Div For Image */}
+                                <div
+                                  className="w-[28%] h-16 lg:w-2/15 lg:h-12 bg-transparent"
+                                  style={{
+                                    backgroundImage: `url('/bolaiVoiceImage_active.svg')`,
+                                    backgroundPosition: "center",
+                                    backgroundRepeat: "no-repeat",
+                                    backgroundSize: "cover",
+                                  }}
+                                ></div>
+                                {/* Div For Name */}
+                                <div className="text-white text-md text-bold">
+                                  {voice.name}
+                                </div>
+                                {/* For The Audio */}
+                                <AudioPlayer src={voice.audio} />
+                              </div>
+                              {/* Div For Default tag, Gender, Accent */}
+                              <div className="w-full flex justify-start items-center gap-x-5 flex-wrap gap-y-1.5">
+                                {/* Div For Default */}
+                                {voice.default ? (
+                                  <div className="text-sm text-white text-semibold w-18 p-1 rounded-sm flex justify-center items-center bg-gradient-to-r from-green-500/80 via-emerald-500/80 to-teal-500/80">
+                                    Default
+                                  </div>
+                                ) : (
+                                  <></>
+                                )}
+                                {/* Div For Gender */}
+                                <div
+                                  className={`text-sm text-white text-semibold p-1 w-16 rounded-sm flex justify-center items-center ${
+                                    voice.gender === "Female"
+                                      ? "font-medium bg-pink-400/20 text-pink-300 border border-pink-400/30"
+                                      : "font-medium bg-blue-400/20 text-blue-300 border border-blue-400/30"
+                                  }`}
+                                >
+                                  {voice.gender}
+                                </div>
+                                {/* Div For Accent */}
+                                <div className="text-sm text-semibold p-1 rounded-sm flex justify-center items-center font-medium bg-cyan-400/20 text-cyan-300 border border-cyan-400/30">
+                                  {voice.accent}
+                                </div>
+                              </div>
+                              {/* Div For Characteristics */}
+                              <div className="w-full flex justify-start items-center  flex-wrap gap-y-2 gap-x-5">
+                                {voice.characteristics.map((character) => (
+                                  <div
+                                    className="text-sm text-semibold p-1 rounded-sm flex justify-center items-center font-medium bg-orange-400/20 text-orange-300 border border-orange-400/30"
+                                    key={character}
+                                  >
+                                    {character}
+                                  </div>
+                                ))}
+                              </div>
+                              {/* Div For Years*/}
+                              <div className="w-full flex justify-start items-center">
+                                <div className="text-gray-300/80 text-sm text-semibold">
+                                  {voice.age}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                      {/* The Footer of the alert: */}
+                      <AlertDialogFooter className="w-full flex jusfity-center items-center">
+                        <AlertDialogCancel className="hover:cursor-pointer text-lg w-[98%] h-12 border-2">
+                          Cancel
+                        </AlertDialogCancel>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </>
+              ) : (
+                <></>
+              )}
+              <div
+                className={`w-[28.5%] md:w-[26.5%] h-[9.5vh] lg:w-[14.5%] lg:h-[7.5vh] rounded-md flex justify-center items-center text-white text-lg transition-all ease-in-out duration-150 hover:scale-110 aspect-square hover:cursor-pointer ${
+                  callStatus === "CONNECTING"
+                    ? "animate-pulse bg-gradient-to-r from-blue-600/90 via-blue-700/90 to-indigo-800/90 hover:from-blue-500/95 hover:via-blue-600/95 hover:to-indigo-700/95 border-1 border-blue-500/80 shadow-md shadow-blue-400/80"
+                    : "bg-gradient-to-r from-emerald-600/90 via-green-700/90 to-teal-800/90 hover:from-emerald-500/95 hover:via-green-600/95 hover:to-teal-700/95 border-1 border-green-500/80 shadow-md shadow-green-400/80"
+                }`}
+                onClick={handleCall}
+              >
+                {isCallInactiveOrFinished ? (
+                  <>
+                    <MdCall className="text-4xl lg:text-3xl md:text-6xl text-white font-semibold mr-0 lg:mr-2" />
+                    <div className="lg:text-[1rem] font-semibold text-white max-sm:hidden md:hidden lg:block">
+                      Initiate Call
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <ImSpinner8 className="text-4xl lg:text-3xl md:text-5xl text-white font-semibold mr-0 lg:mr-2 animate-spin" />
+                    <div className="lg:text-[1rem] font-semibold text-white max-sm:hidden md:hidden lg:block">
+                      Making Call
+                    </div>
+                  </>
+                )}
+              </div>
+            </>
+          ) : (
+            <div
+              className="w-[24%] md:w-[16.5%] h-[9.25vh] lg:w-[10.5%] lg:h-[7.5vh] rounded-md flex justify-center items-center text-white text-lg transition-all ease-in-out duration-150 hover:scale-110 aspect-square hover:cursor-pointer mt-[.25rem] mb-[1rem] bg-gradient-to-r from-rose-600/90 via-red-700/90 to-pink-800/90 hover:from-rose-500/95 hover:via-red-600/95 hover:to-pink-700/95 border-1 border-rose-500/80 shadow-md shadow-rose-400/80"
+              onClick={handleDisconnect}
+            >
+              <MdCallEnd className="text-3xl lg:text-3xl md:text-5xl text-white font-semibold mr-2" />
+              <div className="lg:text-[1rem] font-semibold text-white max-sm:hidden md:hidden lg:block">
+                End Call
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </>
   );
