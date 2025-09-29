@@ -2,18 +2,21 @@
 import HeroCard from "@/components/custom/HeroCard";
 import HowItWorksCard from "@/components/custom/HowItWorksCard";
 import NavBar from "@/components/custom/navBar";
+import Footer from "@/components/custom/footer";
+import SubscriptionCards from "@/components/custom/subscriptionCards";
+import Particles from "@/components/custom/particles";
 import React from "react";
 import { FaArrowRight } from "react-icons/fa";
 
 const HomePage = () => {
   return (
-    <div className="w-full min-h-screen overflow-y-auto flex flex-col justify-start items-center">
+    <div className="w-full min-h-screen overflow-y-auto flex flex-col justify-start items-center bg-gray-900">
       {/* Navbar */}
       <NavBar />
       {/* Hero-Banner */}
-      <div className="w-full h-[125vh] md:h-[105vh] lg:h-[105vh] bg-transparent flex flex-col justify-center items-center mb-4">
+      <div className="w-full h-[110vh] md:h-[105vh] lg:h-[105vh] hero-gradient hero-gradient-overlay floating-lights flex flex-col justify-center items-center mb-12">
         {/* Tagline */}
-        <div className="w-[75%] md:w-[45%] lg:w-[20%] h-[5vh] p-2 rounded-md bg-green-600/80 text-center text-white text-sm flex justify-center items-center font-semibold my-6 lg:my-8 md:text-lg lg:text-sm">
+        <div className="w-[75%] md:w-[45%] lg:w-[20%] h-[5vh] p-2 rounded-md bg-green-600/80 border border-gray-600 text-center text-white text-sm flex justify-center items-center font-semibold my-6 lg:my-8 md:text-lg lg:text-sm">
           🎯 AI-Powered Interview Preparation
         </div>
         {/* Hero Text */}
@@ -36,20 +39,30 @@ const HomePage = () => {
           </div>
         </div>
         {/* Action Button */}
-        <div className="w-[75%] md:w-[45%] lg:w-[20%] h-[8.5vh] bg-green-600/80 rounded-sm flex justify-center items-center p-2 transition-all ease-in-out duration-150 hover:cursor-pointer hover:scale-95 hover:bg-green-600/50">
+        <div className="w-[75%] md:w-[45%] lg:w-[20%] h-[8.5vh] bg-green-600 hover:bg-green-700 rounded-md border border-gray-600 flex justify-center items-center p-2 transition-all ease-in-out duration-150 hover:cursor-pointer hover:scale-95">
           <div className="text-lg lg:text-lg md:text-2xl text-white font-bold">
             Start Practicing Now!
           </div>
         </div>
       </div>
+
+      <Particles />
       {/* Features Section */}
-      <div className="w-full h-[300vh] md:h-[135vh] lg:h-[120vh] bg-gray-900/80 flex flex-col justify-center items-center mt-2 overflow-y-auto">
-        <div className="my-6 text-center text-4xl md:text-6xl lg:text-4xl text-white font-bold">
-          Why Choose BolAi?
+      <div className="w-full h-[300vh] md:h-[135vh] lg:h-[120vh] flex flex-col justify-center items-center mt-4 overflow-y-auto">
+        {/* Title */}
+        <div className="text-center mb-8">
+          <h2 className="text-4xl md:text-5xl lg:text-4xl font-bold text-white mb-4">
+            Why Choose BolAi?
+          </h2>
+          <div className="w-24 h-1 bg-gradient-to-r from-green-500 to-emerald-600 mx-auto rounded-full"></div>
         </div>
-        <div className="my-6 text-center text-lg md:text-xl text-white w-[75%] lg:w-[55%]">
-          Our AI-powered platform provides comprehensive interview preparation
-          tailored to your specific needs and industry.
+
+        {/* Description */}
+        <div className="text-center mb-16">
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+            Our AI-powered platform provides comprehensive interview preparation
+            tailored to your specific needs and industry.
+          </p>
         </div>
         <div className="w-[95%] flex flex-col justify-start items-center md:flex-row md:flex-wrap md:justify-evenly md:items-start lg:flex-row lg:flex-wrap lg:justify-evenly lg:items-start my-6">
           <HeroCard
@@ -96,82 +109,113 @@ const HomePage = () => {
           />
         </div>
       </div>
+
+      <Particles />
+
       {/* How It Works Section */}
-      <div className="w-full h-[185vh] md:h-[90vh] lg:h-[95vh] bg-transparent flex flex-col justify-center items-center mb-4">
-        {/* Title */}
-        <div className="my-8 text-center text-4xl md:text-6xl lg:text-4xl text-white font-bold">
-          How BolAi Works?
+      <div className="w-full mt-16 pb-32 bg-gray-900 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 relative z-10">
+          {/* Title */}
+          <div className="text-center mb-8">
+            <h2 className="text-4xl md:text-5xl lg:text-4xl font-bold text-white mb-4">
+              How BolAi Works?
+            </h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-green-500 to-emerald-600 mx-auto rounded-full"></div>
+          </div>
+
+          {/* Description */}
+          <div className="text-center mb-16">
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+              Get started in minutes and begin improving your interview skills
+              immediately with our streamlined process.
+            </p>
+          </div>
+
+          {/* Cards Display */}
+          <div className="grid grid-cols-1 md:grid-cols-3 mt-24 gap-6 lg:gap-8 max-w-6xl mx-auto">
+            <HowItWorksCard
+              motif={1}
+              title={"Set Your Profile"}
+              desc={
+                "Share your job, field, and level for custom questions tailored to your career path."
+              }
+            />
+            <HowItWorksCard
+              motif={2}
+              title={"Practice with AI"}
+              desc={
+                "Have realistic AI interviews that adjust to your answers and provide real-time interaction."
+              }
+            />
+            <HowItWorksCard
+              motif={3}
+              title={"Get Feedback & Grow"}
+              desc={
+                "Get detailed feedback and track your improvement with personalized insights and analytics."
+              }
+            />
+          </div>
         </div>
-        {/* Description */}
-        <div className="my-8 text-center text-lg md:text-xl text-white w-[75%] lg:w-[45%]">
-          Get started in minutes and begin improving your interview skills
-          immediately.
+      </div>
+
+      {/* Wave Separator From Internet */}
+      <div
+        className="w-full h-24 bg-gray-800/50"
+        style={{
+          clipPath: "ellipse(70% 80px at 50% 100%)",
+        }}
+      ></div>
+      {/* Pricing Section */}
+      <div className="w-full relative bg-gradient-to-b from-gray-800/50 via-gray-900/50 to-gray-900 pt-0 pb-10">
+        <Particles />
+        <div className="w-full py-20 relative -mt-32 z-10">
+          <div className="max-w-7xl mx-auto px-12">
+            {/* Title */}
+            <div className="text-center mb-6">
+              <h2 className="text-4xl md:text-5xl lg:text-4xl font-bold text-white mb-4">
+                Simple, Transparent Pricing
+              </h2>
+              <div className="w-24 h-1 bg-gradient-to-r from-green-500 to-emerald-600 mx-auto rounded-full"></div>
+            </div>
+
+            {/* Description */}
+            <div className="text-center mb-16">
+              <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+                Choose the plan that fits your needs. All plans include core
+                features to help you ace your interviews.
+              </p>
+            </div>
+
+            {/* Subscription Cards */}
+            <SubscriptionCards />
+          </div>
         </div>
-        {/* Cards Display */}
-        <div className="w-[95%] flex flex-col justify-start items-center md:flex-row md:flex-wrap md:justify-evenly md:items-start lg:flex-row lg:flex-wrap lg:justify-evenly lg:items-start my-8">
-          <HowItWorksCard
-            motif={1}
-            title={"Set Your Profile"}
-            desc={"Share your job, field, and level for custom questions."}
-          />
-          <HowItWorksCard
-            motif={2}
-            title={"Practice with AI"}
-            desc={"Have realistic AI interviews that adjust to your answers."}
-          />
-          <HowItWorksCard
-            motif={3}
-            title={"Get feedback and grow."}
-            desc={"Get detailed feedback and track your improvement."}
-          />
-        </div>
+        <Particles />
       </div>
       {/* Banner */}
-      <div className="w-full h-[85vh] lg:h-[50vh] bg-green-500/80 flex flex-col justify-center items-center">
-        {/* Main_Tagline */}
-        <div className="my-6 text-center text-4xl md:text-6xl lg:text-4xl text-white font-bold">
-          Ready to Ace Your Next Interview?
-        </div>
-        {/* Description */}
-        <div className="my-6 text-center text-lg md:text-xl text-white w-[95%] lg:w-[45%]">
-          Join many inspiring professionals who have improved their interview
-          skills with BolAi. Start your journey with us and speak with
-          confidence.
-        </div>
-        {/* Buttons */}
-        <div className="w-[95%] lg:w-[55%] flex flex-col justify-evenly items-center lg:flex-row lg:justify-center lg:items-center mb-2">
-          <div className="w-[75%] lg:w-[35%] h-[8vh] rounded-md bg-white mr-4 transition-all ease-in-out duration-150 hover:scale-95 hover:cursor-pointer flex justify-center items-center text-center font-semibold text-xl text-green-500/80 hover:bg-gray-200 mb-4 md:lg-6 lg:mb-0">
-            Start Today
-            <span className="ml-2">
-              <FaArrowRight className="text-xl text-green-500/80 font-semibold" />{" "}
-            </span>
-          </div>
-          <div className="w-[75%] lg:w-[35%] h-[8vh] rounded-md bg-transparent border-1 border-white transition-all ease-in-out duration-150 hover:scale-95 hover:cursor-pointer flex justify-center items-center text-center font-semibold text-xl text-white hover:bg-white hover:text-green-500/80">
-            Schedule Interview
+      <div className="w-full px-12 pt-0 pb-20 mb-4">
+        <div className="max-w-7xl mx-auto bg-gradient-to-br from-emerald-600 via-green-400 to-green-900 rounded-2xl p-12 text-center shadow-xl">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            Ready to Ace Your Next Interview?
+          </h2>
+          <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
+            Join many inspiring professionals who have improved their interview
+            skills with BolAi. Start your journey with us and speak with
+            confidence.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <button className="bg-white text-emerald-600 font-semibold px-8 py-3 rounded-lg hover:bg-gray-50 transition-all duration-200 hover:cursor-pointer hover:scale-105 shadow-lg flex items-center gap-2">
+              Start Today
+              <FaArrowRight className="text-sm" />
+            </button>
+            <button className="border-2 border-white/40 text-white font-semibold px-8 py-3 rounded-lg hover:cursor-pointer hover:bg-white/20 transition-all duration-200 hover:scale-105">
+              Schedule Interview
+            </button>
           </div>
         </div>
       </div>
-      {/* Footer Portion */}
-      <div className="w-full h-[35vh] md:h-[25vh] lg:h-[20vh] bg-gray-900/80 flex flex-col justify-center items-center">
-        <div className="w-[95%] flex flex-col justify-evenly items-center lg:flex-row lg:justify-around lg:items-center">
-          {/* Description */}
-          <div className="my-6 text-justify text-md md:text-xl lg:text-sm text-white p-2">
-            © LSPP 2025 Team Future Frogs. All rights reserved.
-          </div>
-          {/* Logo */}
-          <div className="w-[58%] md:w-[45%] lg:w-[20%] h-[12vh] flex justify-center items-center mr-2">
-            <div
-              className="w-[95%] h-[10vh] ml-4 md:ml-0 lg:ml-0 lg:w-[58%] lg:h-[9.5vh] md:w-[75%] md:h-[9.5vh] mr-2"
-              style={{
-                backgroundImage: `url('/wordmark-white.png')`,
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "cover",
-              }}
-            ></div>
-          </div>
-        </div>
-      </div>
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
