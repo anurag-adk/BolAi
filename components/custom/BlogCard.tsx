@@ -24,59 +24,61 @@ const BlogCard = ({ blog }: BlogCardProps) => {
     : null;
 
   return (
-    <Link
-      href={`/blogs/${blog.slug}`}
-      className="w-full md:w-[95%] h-[58vh] md:h-[52vh] lg:w-[30%] lg:h-[58vh] rounded-lg bg-black/60 hover:bg-gray-800 transition-all duration-150 ease-in-out aspect-square flex flex-col justify-start items-start gap-y-2 hover:scale-105 shadow-lg shadow-green-500/60 hover:shadow-none"
-    >
-      {/* The Cover Image */}
-      <div
-        className="w-full h-7/15 rounded-t-md"
-        style={{
-          backgroundImage: `url(${blog.cover})`,
-          backgroundPosition: "center",
-          backgroundSize: "cover",
-          backgroundRepeat: "no-repeat",
-        }}
-      ></div>
+    <div className="w-full md:w-[95%] lg:w-[28%] aspect-square p-[1px] rounded-2xl bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 hover:from-cyan-300 hover:via-blue-400 hover:to-purple-500 transition-all duration-300">
+      <Link
+        href={`/blogs/${blog.slug}`}
+        className="w-full h-full rounded-2xl bg-gray-900 hover:bg-gray-800 transition-all duration-150 ease-in-out hover:scale-[0.98] p-4 flex flex-col gap-y-2"
+      >
+        {/* The Cover Image */}
+        <div
+          className="w-full h-[28vh] rounded-md mb-3"
+          style={{
+            backgroundImage: `url(${blog.cover})`,
+            backgroundPosition: "center",
+            backgroundSize: "cover",
+            backgroundRepeat: "no-repeat",
+          }}
+        />
 
-      {/* Tags, Content & Date-Time */}
-      <div className="w-full flex flex-col justify-evenly items-center gap-y-1.5">
-        {/* Tags */}
-        <div className="w-full flex justify-center items-center flex-wrap gap-x-1">
-          {blog.tags.map((tag) => (
-            <div
-              key={tag}
-              className="px-2 py-0.5 text-[12px] md:text-[14px] lg:text-[10px] uppercase bg-green-900/25 text-green-300 rounded mb-1"
-            >
-              {tag}
-            </div>
-          ))}
-        </div>
-        {/* Content */}
-        <div className="w-full flex flex-col flex-1 p-4 gap-y-2">
-          <h3 className="text-white text-md font-semibold line-clamp-2 text-center text-lg md:text-xl lg:text-sm">
-            {blog.title}
-          </h3>
+        {/* Content Area */}
+        <div className="flex-1 flex flex-col justify-between">
+          {/* Tags */}
+          <div className="flex justify-center items-center flex-wrap gap-1 mb-3">
+            {blog.tags.slice(0, 3).map((tag) => (
+              <span
+                key={tag}
+                className="px-2 py-0.5 text-xs uppercase bg-green-900/25 text-green-300 rounded"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
 
-          {blog.excerpt && (
-            <p className="text-gray-300 text-md md:text-lg lg:text-sm line-clamp-2 text-justify md:text-center lg:text-justify p-0.5">
-              {blog.excerpt}
-            </p>
-          )}
-        </div>
-        {/* Date And Time */}
-        <div className="w-full flex flex-row justify-center items-center p-1 mb-2">
-          {/* Date */}
-          <div className="px-2 py-0.5 text-[12px] md:text-[14px] lg:text-[10px] uppercase bg-orange-400/75 text-white rounded mr-2">
-            {dateLabel}
+          {/* Title and Excerpt */}
+          <div className="flex-1 mb-3">
+            <h3 className="text-white text-base font-semibold line-clamp-2 text-center mb-2">
+              {blog.title}
+            </h3>
+
+            {blog.excerpt && (
+              <p className="text-gray-300 text-sm line-clamp-2 text-center">
+                {blog.excerpt}
+              </p>
+            )}
           </div>
-          {/* Time */}
-          <div className="px-2 py-0.5 text-[12px] md:text-[14px] lg:text-[10px] uppercase bg-slate-400/75 text-white rounded">
-            {blog.readingTime} min read
+
+          {/* Date And Reading Time */}
+          <div className="flex justify-center items-center mb-2 mt-auto">
+            <span className="px-2 py-0.5 text-xs uppercase bg-orange-400/75 text-white rounded mr-2">
+              {dateLabel}
+            </span>
+            <span className="px-2 py-0.5 text-xs uppercase bg-slate-400/75 text-white rounded">
+              {blog.readingTime} min read
+            </span>
           </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </div>
   );
 };
 

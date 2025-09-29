@@ -164,7 +164,7 @@ const Sidebar = () => {
                     href="/home"
                     className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
                       pathname === "/home"
-                        ? "text-white bg-gradient-to-r from-green-500/80 via-teal-500/80 to-emerald-500/80 py-3.5 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/80 scale-105"
+                        ? "text-white bg-gradient-to-r from-green-500/50 via-teal-500/50 to-emerald-500/50 py-2 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/50 scale-105"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
                     }`}
                     onClick={closeMobileMenu}
@@ -179,7 +179,7 @@ const Sidebar = () => {
                     href="/interview"
                     className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
                       pathname === "/interview"
-                        ? "text-white bg-gradient-to-r from-green-500/80 via-teal-500/80 to-emerald-500/80 py-3.5 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/80 scale-105"
+                        ? "text-white bg-gradient-to-r from-green-500/50 via-teal-500/50 to-emerald-500/50 py-2 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/50 scale-105"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
                     }`}
                     onClick={closeMobileMenu}
@@ -194,7 +194,7 @@ const Sidebar = () => {
                     href="/my-interviews"
                     className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
                       pathname === "/my-interviews"
-                        ? "text-white bg-gradient-to-r from-green-500/80 via-teal-500/80 to-emerald-500/80 py-3.5 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/80 scale-105"
+                        ? "text-white bg-gradient-to-r from-green-500/50 via-teal-500/50 to-emerald-500/50 py-2 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/50 scale-105"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
                     }`}
                     onClick={closeMobileMenu}
@@ -209,7 +209,7 @@ const Sidebar = () => {
                     href="/interviewHub"
                     className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
                       pathname === "/interviewHub"
-                        ? "text-white bg-gradient-to-r from-green-500/80 via-teal-500/80 to-emerald-500/80 py-3.5 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/80 scale-105"
+                        ? "text-white bg-gradient-to-r from-green-500/50 via-teal-500/50 to-emerald-500/50 py-2 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/50 scale-105"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
                     }`}
                     onClick={closeMobileMenu}
@@ -232,7 +232,7 @@ const Sidebar = () => {
                     href="/get-started"
                     className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
                       pathname === "/get-started"
-                        ? "text-white bg-gradient-to-r from-green-500/80 via-teal-500/80 to-emerald-500/80 py-3.5 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/80 scale-105"
+                        ? "text-white bg-gradient-to-r from-green-500/50 via-teal-500/50 to-emerald-500/50 py-2 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/50 scale-105"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
                     }`}
                     onClick={closeMobileMenu}
@@ -247,7 +247,7 @@ const Sidebar = () => {
                     href="/blogs"
                     className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
                       pathname === "/blogs"
-                        ? "text-white bg-gradient-to-r from-green-500/80 via-teal-500/80 to-emerald-500/80 py-3.5 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/80 scale-105"
+                        ? "text-white bg-gradient-to-r from-green-500/50 via-teal-500/50 to-emerald-500/50 py-2 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/50 scale-105"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
                     }`}
                     onClick={closeMobileMenu}
@@ -270,7 +270,7 @@ const Sidebar = () => {
                     href="/profile"
                     className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
                       pathname === "/profile"
-                        ? "text-white bg-gradient-to-r from-green-500/80 via-teal-500/80 to-emerald-500/80 py-3.5 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/80 scale-105"
+                        ? "text-white bg-gradient-to-r from-green-500/50 via-teal-500/50 to-emerald-500/50 py-2 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/50 scale-105"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
                     }`}
                     onClick={closeMobileMenu}
@@ -285,7 +285,7 @@ const Sidebar = () => {
                     href="/subscription"
                     className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
                       pathname === "/subscription"
-                        ? "text-white bg-gradient-to-r from-green-500/80 via-teal-500/80 to-emerald-500/80 py-3.5 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/80 scale-105"
+                        ? "text-white bg-gradient-to-r from-green-500/50 via-teal-500/50 to-emerald-500/50 py-2 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/50 scale-105"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
                     }`}
                     onClick={closeMobileMenu}

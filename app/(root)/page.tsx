@@ -4,6 +4,7 @@ import HowItWorksCard from "@/components/custom/HowItWorksCard";
 import NavBar from "@/components/custom/navBar";
 import React from "react";
 import { FaArrowRight } from "react-icons/fa";
+import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision";
 
 const HomePage = () => {
   return (
@@ -11,37 +12,39 @@ const HomePage = () => {
       {/* Navbar */}
       <NavBar />
       {/* Hero-Banner */}
-      <div className="w-full h-[125vh] md:h-[105vh] lg:h-[105vh] bg-transparent flex flex-col justify-center items-center mb-4">
-        {/* Tagline */}
-        <div className="w-[75%] md:w-[45%] lg:w-[20%] h-[5vh] p-2 rounded-md bg-green-600/80 text-center text-white text-sm flex justify-center items-center font-semibold my-6 lg:my-8 md:text-lg lg:text-sm">
-          🎯 AI-Powered Interview Preparation
-        </div>
-        {/* Hero Text */}
-        <div className="w-[95%] md:w-[75%] lg:w-[55%] flex justify-center items-center p-2 my-6">
-          <div className="text-5xl md:text-6xl lg:text-6xl font-bold text-white mr-1 text-center">
-            Master Your Next Interview with{" "}
-            <span className="text-5xl md:text-6xl lg:text-6xl font-bold text-green-500">
-              {" "}
-              BolAi{" "}
-            </span>
+      <BackgroundBeamsWithCollision className="w-full h-[125vh] md:h-[105vh] lg:h-[105vh]">
+        <div className="w-full h-full bg-transparent flex flex-col justify-center items-center mb-4">
+          {/* Tagline */}
+          <div className="w-[75%] md:w-[45%] lg:w-[20%] h-[5vh] p-2 rounded-md bg-green-600/80 text-center text-white text-sm flex justify-center items-center font-semibold my-6 lg:my-8 md:text-lg lg:text-sm">
+            🎯 AI-Powered Interview Preparation
+          </div>
+          {/* Hero Text */}
+          <div className="w-[95%] md:w-[75%] lg:w-[55%] flex justify-center items-center p-2 my-6">
+            <div className="text-5xl md:text-6xl lg:text-6xl font-bold text-white mr-1 text-center">
+              Master Your Next Interview with{" "}
+              <span className="text-5xl md:text-6xl lg:text-6xl font-bold text-green-500">
+                {" "}
+                BolAi{" "}
+              </span>
+            </div>
+          </div>
+          {/* Hero Description */}
+          <div className="w-[95%] md:w-[75%] lg:w-[55%] flex justify-center items-center p-2 my-6">
+            <div className="text-lg md:text-xl lg:text-lg text-white mr-1 text-center lg:text-center md:text-center">
+              Practice real interview scenarios with our advanced AI. Get
+              personalized feedback, improve your confidence, and land your
+              dream job. BolAi means "speak" in Nepali – and we'll help you
+              speak with confidence.
+            </div>
+          </div>
+          {/* Action Button */}
+          <div className="w-[75%] md:w-[45%] lg:w-[20%] h-[8.5vh] bg-green-600/80 rounded-sm flex justify-center items-center p-2 transition-all ease-in-out duration-150 hover:cursor-pointer hover:scale-95 hover:bg-green-600/50">
+            <div className="text-lg lg:text-lg md:text-2xl text-white font-bold">
+              Start Practicing Now!
+            </div>
           </div>
         </div>
-        {/* Hero Description */}
-        <div className="w-[95%] md:w-[75%] lg:w-[55%] flex justify-center items-center p-2 my-6">
-          <div className="text-lg md:text-xl lg:text-lg text-white mr-1 text-center lg:text-center md:text-center">
-            Practice real interview scenarios with our advanced AI. Get
-            personalized feedback, improve your confidence, and land your dream
-            job. BolAi means "speak" in Nepali – and we'll help you speak with
-            confidence.
-          </div>
-        </div>
-        {/* Action Button */}
-        <div className="w-[75%] md:w-[45%] lg:w-[20%] h-[8.5vh] bg-green-600/80 rounded-sm flex justify-center items-center p-2 transition-all ease-in-out duration-150 hover:cursor-pointer hover:scale-95 hover:bg-green-600/50">
-          <div className="text-lg lg:text-lg md:text-2xl text-white font-bold">
-            Start Practicing Now!
-          </div>
-        </div>
-      </div>
+      </BackgroundBeamsWithCollision>
       {/* Features Section */}
       <div className="w-full h-[300vh] md:h-[135vh] lg:h-[120vh] bg-gray-900/80 flex flex-col justify-center items-center mt-2 overflow-y-auto">
         <div className="my-6 text-center text-4xl md:text-6xl lg:text-4xl text-white font-bold">
