@@ -29,7 +29,7 @@ export default function ArticleLayout({
         {/* Back link  */}
         <Link
           href={backHref}
-          className="mb-4 inline-flex items-center text-sm md:text-base font-medium text-gray-300 hover:text-green-300 transition-colors group mt-4 hover:underline"
+          className="mb-4 inline-flex items-center text-sm md:text-base font-medium text-gray-300 hover:text-green-300 transition-colors group mt-4 hover:underline p-4 bg-green-500/30 rounded-md"
         >
           <span className="mr-2 h-6 w-6 rounded-full bg-green-600/30 border border-green-500/40 flex items-center justify-center group-hover:bg-green-600/60 group-hover:scale-95 transition">
             <svg

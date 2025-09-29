@@ -7,6 +7,7 @@ import SubscriptionCards from "@/components/custom/subscriptionCards";
 import Particles from "@/components/custom/particles";
 import React from "react";
 import { FaArrowRight } from "react-icons/fa";
+import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision";
 
 const HomePage = () => {
   return (
