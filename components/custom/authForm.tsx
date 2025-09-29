@@ -22,6 +22,7 @@ import { generateOtp, generateToken } from "@/lib/otpTokenUtils";
 
 //ShadCn Components:
 import { Button } from "@/components/ui/button";
+import { BackgroundGradientAnimation } from "../ui/background-gradient-animation";
 
 //ShadCn Form Component:
 const authFormSchema = (type: any) => {
@@ -129,142 +130,144 @@ const AuthForm = ({ type }: any) => {
   const isSignup = type === "signup";
 
   return (
-    <div className="min-h-screen w-full px-6 py-8 relative z-10">
-      {/* Header with Logo */}
-      <div className="w-full mb-12">
-        <Link
-          href={"/"}
-          className="inline-flex items-center gap-3 hover:opacity-80 transition-opacity duration-200"
-        >
-          {/* Logo */}
-          <div
-            className="w-12 h-12 bg-transparent rounded-lg"
-            style={{
-              backgroundImage: `url('/motif.png')`,
-              backgroundPosition: "center",
-              backgroundSize: "cover",
-              backgroundRepeat: "no-repeat",
-            }}
-          ></div>
-          {/* Title */}
-          <div className="text-3xl font-bold text-green-500">BolAi</div>
-        </Link>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-md mx-auto">
-        {/* Welcome Section */}
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold text-white mb-4">
-            {isSignup ? "Create Your Account" : "Welcome Back"}
-          </h1>
-          <p className="text-gray-400 text-lg leading-relaxed">
-            {isSignup
-              ? "Start your interview preparation journey today"
-              : "Sign in to continue your interview preparation"}
-          </p>
+    <BackgroundGradientAnimation className="w-full min-h-screen">
+      <div className="flex flex-col min-h-screen px-6 py-8 relative z-10">
+        {/* Header with Logo */}
+        <div className="w-full mb-6 flex-shrink-0">
+          <Link
+            href={"/"}
+            className="inline-flex items-center gap-3 hover:opacity-80 transition-opacity duration-200"
+          >
+            {/* Logo */}
+            <div
+              className="w-12 h-12 bg-transparent rounded-lg"
+              style={{
+                backgroundImage: `url('/motif.png')`,
+                backgroundPosition: "center",
+                backgroundSize: "cover",
+                backgroundRepeat: "no-repeat",
+              }}
+            ></div>
+            {/* Title */}
+            <div className="text-3xl font-bold text-green-500">BolAi</div>
+          </Link>
         </div>
-        {/* The Form */}
-        <div className="w-full bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-2xl">
-          {/* Title And Description For The Form */}
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-white mb-3">
-              {isSignup ? "Sign Up" : "Sign In"}
-            </h2>
-            {/* <p className="text-gray-400 text-sm leading-relaxed">
-              {isSignup
-                ? "Create your account to get started with BolAi"
-                : "Enter your email and password to access your account"}
-            </p> */}
-          </div>
+        {/* Main Content - Scrollable container */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-md mx-auto w-full pb-6">
+            {/* Welcome Section */}
+            <div className="text-center mb-6">
+              <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">
+                {isSignup ? "Create Your Account" : "Welcome Back"}
+              </h1>
+              <p className="text-gray-400 text-base sm:text-lg leading-relaxed">
+                {isSignup
+                  ? "Start your interview preparation journey today"
+                  : "Sign in to continue your interview preparation"}
+              </p>
+            </div>
 
-          {/* Form Elements */}
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="w-full space-y-6"
-            >
-              {isSignup && (
-                <div className="[&_input]:!h-12 [&_label]:!text-gray-300 [&_label]:!font-medium">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    label="Full Name"
-                    placeholder="Enter your full name"
-                  />
-                </div>
-              )}
-              <div className="[&_input]:!h-12 [&_label]:!text-gray-300 [&_label]:!font-medium">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  label="Email Address"
-                  type="email"
-                  placeholder="example@email.com"
-                />
+            {/* The Form */}
+            <div className="w-full bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl">
+              {/* Title And Description For The Form */}
+              <div className="text-center mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">
+                  {isSignup ? "Sign Up" : "Sign In"}
+                </h2>
               </div>
-              <div className="relative">
-                <div className="[&_input]:!h-12 [&_label]:!text-gray-300 [&_label]:!font-medium [&_input]:!pr-12">
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    label="Password"
-                    type={isPasswordVisible ? "text" : "password"}
-                    placeholder="* * * * * * * * * * * *"
-                  />
-                </div>
-                <button
-                  type="button"
-                  className="absolute right-3 top-9 w-8 h-8 transition-all duration-200 flex justify-center items-center group"
-                  onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-                >
-                  {isPasswordVisible ? (
-                    <IoMdEyeOff className="text-lg text-gray-400 group-hover:text-white transition-colors duration-200" />
-                  ) : (
-                    <IoMdEye className="text-lg text-gray-400 group-hover:text-white transition-colors duration-200" />
-                  )}
-                </button>
-              </div>
-              <div className="relative group">
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="relative w-full h-12 bg-gradient-to-br from-green-500 via-green-600 to-emerald-700 hover:from-green-600 hover:via-green-700 hover:to-emerald-800 hover:scale-97 text-white font-semibold rounded-lg transition-all duration-300 cursor-pointer shadow-xl border border-green-400/30 hover:border-green-300/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 z-10"
-                >
-                  {/* Inner highlight */}
-                  <div className="absolute inset-1 rounded-lg bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
 
-                  {isLoading ? (
-                    <div className="flex items-center justify-center gap-2 relative z-10">
-                      <ImSpinner8 className="animate-spin" />
-                      <span>
-                        {isSignup ? "Creating Account..." : "Signing In..."}
-                      </span>
+              {/* Form Elements */}
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="w-full space-y-4"
+                >
+                  {isSignup && (
+                    <div className="[&_input]:!h-12 [&_label]:!text-gray-300 [&_label]:!font-medium">
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        label="Full Name"
+                        placeholder="Enter your full name"
+                      />
                     </div>
-                  ) : isSignup ? (
-                    <span className="relative z-10">Create Account</span>
-                  ) : (
-                    <span className="relative z-10">Sign In</span>
                   )}
-                </Button>
+                  <div className="[&_input]:!h-12 [&_label]:!text-gray-300 [&_label]:!font-medium">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      label="Email Address"
+                      type="email"
+                      placeholder="example@email.com"
+                    />
+                  </div>
+                  <div className="relative">
+                    <div className="[&_input]:!h-12 [&_label]:!text-gray-300 [&_label]:!font-medium [&_input]:!pr-12">
+                      <FormField
+                        control={form.control}
+                        name="password"
+                        label="Password"
+                        type={isPasswordVisible ? "text" : "password"}
+                        placeholder="* * * * * * * * * * * *"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      className="absolute right-3 top-9 w-8 h-8 transition-all duration-200 flex justify-center items-center group"
+                      onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                    >
+                      {isPasswordVisible ? (
+                        <IoMdEyeOff className="text-lg text-gray-400 group-hover:text-white transition-colors duration-200" />
+                      ) : (
+                        <IoMdEye className="text-lg text-gray-400 group-hover:text-white transition-colors duration-200" />
+                      )}
+                    </button>
+                  </div>
+                  <div className="relative group pt-2">
+                    <Button
+                      type="submit"
+                      disabled={isLoading}
+                      className="relative w-full h-12 bg-gradient-to-br from-green-500 via-green-600 to-emerald-700 hover:from-green-600 hover:via-green-700 hover:to-emerald-800 hover:scale-97 text-white font-semibold rounded-lg transition-all duration-300 cursor-pointer shadow-xl border border-green-400/30 hover:border-green-300/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 z-10"
+                    >
+                      {/* Inner highlight */}
+                      <div className="absolute inset-1 rounded-lg bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
+
+                      {isLoading ? (
+                        <div className="flex items-center justify-center gap-2 relative z-10">
+                          <ImSpinner8 className="animate-spin" />
+                          <span>
+                            {isSignup ? "Creating Account..." : "Signing In..."}
+                          </span>
+                        </div>
+                      ) : isSignup ? (
+                        <span className="relative z-10">Create Account</span>
+                      ) : (
+                        <span className="relative z-10">Sign In</span>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+
+              {/* The Link For Transition To Signup And Login */}
+              <div className="mt-6 text-center">
+                <p className="text-gray-400 text-sm">
+                  {isSignup
+                    ? "Already have an account?"
+                    : "Don't have an account?"}{" "}
+                  <Link
+                    href={isSignup ? "/login" : "/signup"}
+                    className="text-green-500 hover:text-green-400 font-semibold transition-colors duration-200 hover:underline"
+                  >
+                    {isSignup ? "Sign In" : "Sign Up"}
+                  </Link>
+                </p>
               </div>
-            </form>
-          </Form>
-          {/* The Link For Transition To Signup And Login */}
-          <div className="mt-8 text-center">
-            <p className="text-gray-400 text-sm">
-              {isSignup ? "Already have an account?" : "Don't have an account?"}{" "}
-              <Link
-                href={isSignup ? "/login" : "/signup"}
-                className="text-green-500 hover:text-green-400 font-semibold transition-colors duration-200 hover:underline"
-              >
-                {isSignup ? "Sign In" : "Sign Up"}
-              </Link>
-            </p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </BackgroundGradientAnimation>
   );
 };
 

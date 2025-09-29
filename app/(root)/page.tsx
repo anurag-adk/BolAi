@@ -15,37 +15,39 @@ const HomePage = () => {
       {/* Navbar */}
       <NavBar />
       {/* Hero-Banner */}
-      <div className="w-full h-[110vh] md:h-[105vh] lg:h-[105vh] hero-gradient hero-gradient-overlay floating-lights flex flex-col justify-center items-center mb-12">
-        {/* Tagline */}
-        <div className="w-[75%] md:w-[45%] lg:w-[20%] h-[5vh] p-2 rounded-md bg-green-600/80 border border-gray-600 text-center text-white text-sm flex justify-center items-center font-semibold my-6 lg:my-8 md:text-lg lg:text-sm">
-          🎯 AI-Powered Interview Preparation
-        </div>
-        {/* Hero Text */}
-        <div className="w-[95%] md:w-[75%] lg:w-[55%] flex justify-center items-center p-2 my-6">
-          <div className="text-5xl md:text-6xl lg:text-6xl font-bold text-white mr-1 text-center">
-            Master Your Next Interview with{" "}
-            <span className="text-5xl md:text-6xl lg:text-6xl font-bold text-green-500">
-              {" "}
-              BolAi{" "}
-            </span>
+      <BackgroundBeamsWithCollision className="w-full h-[110vh] md:h-[105vh] lg:h-[105vh]">
+        <div className="w-full h-full hero-gradient hero-gradient-overlay floating-lights flex flex-col justify-center items-center mb-12">
+          {/* Tagline */}
+          <div className="w-[75%] md:w-[45%] lg:w-[20%] h-[5vh] p-2 rounded-md bg-green-600/80 border border-gray-600 text-center text-white text-sm flex justify-center items-center font-semibold my-6 lg:my-8 md:text-lg lg:text-sm">
+            🎯 AI-Powered Interview Preparation
+          </div>
+          {/* Hero Text */}
+          <div className="w-[95%] md:w-[75%] lg:w-[55%] flex justify-center items-center p-2 my-6">
+            <div className="text-5xl md:text-6xl lg:text-6xl font-bold text-white mr-1 text-center">
+              Master Your Next Interview with{" "}
+              <span className="text-5xl md:text-6xl lg:text-6xl font-bold text-green-500">
+                {" "}
+                BolAi{" "}
+              </span>
+            </div>
+          </div>
+          {/* Hero Description */}
+          <div className="w-[95%] md:w-[75%] lg:w-[55%] flex justify-center items-center p-2 my-6">
+            <div className="text-lg md:text-xl lg:text-lg text-white mr-1 text-center lg:text-center md:text-center">
+              Practice real interview scenarios with our advanced AI. Get
+              personalized feedback, improve your confidence, and land your
+              dream job. BolAi means "speak" in Nepali – and we'll help you
+              speak with confidence.
+            </div>
+          </div>
+          {/* Action Button */}
+          <div className="w-[75%] md:w-[45%] lg:w-[20%] h-[8.5vh] bg-green-600 hover:bg-green-700 rounded-md border border-gray-600 flex justify-center items-center p-2 transition-all ease-in-out duration-150 hover:cursor-pointer hover:scale-95">
+            <div className="text-lg lg:text-lg md:text-2xl text-white font-bold">
+              Start Practicing Now!
+            </div>
           </div>
         </div>
-        {/* Hero Description */}
-        <div className="w-[95%] md:w-[75%] lg:w-[55%] flex justify-center items-center p-2 my-6">
-          <div className="text-lg md:text-xl lg:text-lg text-white mr-1 text-center lg:text-center md:text-center">
-            Practice real interview scenarios with our advanced AI. Get
-            personalized feedback, improve your confidence, and land your dream
-            job. BolAi means "speak" in Nepali – and we'll help you speak with
-            confidence.
-          </div>
-        </div>
-        {/* Action Button */}
-        <div className="w-[75%] md:w-[45%] lg:w-[20%] h-[8.5vh] bg-green-600 hover:bg-green-700 rounded-md border border-gray-600 flex justify-center items-center p-2 transition-all ease-in-out duration-150 hover:cursor-pointer hover:scale-95">
-          <div className="text-lg lg:text-lg md:text-2xl text-white font-bold">
-            Start Practicing Now!
-          </div>
-        </div>
-      </div>
+      </BackgroundBeamsWithCollision>
 
       <Particles />
       {/* Features Section */}
@@ -195,7 +197,7 @@ const HomePage = () => {
       </div>
       {/* Banner */}
       <div className="w-full px-12 pt-0 pb-20 mb-4">
-        <div className="max-w-7xl mx-auto bg-gradient-to-br from-emerald-600 via-green-400 to-green-900 rounded-2xl p-12 text-center shadow-xl">
+        <div className="max-w-7xl mx-auto bg-gradient-to-br from-emerald-600 via-green-400 to-green-800 p-12 text-center shadow-xl rounded-2xl backdrop-blur-md">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Ready to Ace Your Next Interview?
           </h2>

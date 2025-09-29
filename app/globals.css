@@ -215,10 +215,10 @@
 .hero-gradient {
   background: radial-gradient(
     circle at 20% 80%,
-    rgba(17, 24, 39, 0.95) 0%,
-    rgba(31, 41, 55, 0.9) 25%,
-    rgba(17, 24, 39, 0.95) 50%,
-    rgba(15, 23, 42, 0.98) 100%
+    rgba(17, 24, 39, 0.6) 0%,
+    rgba(31, 41, 55, 0.5) 25%,
+    rgba(17, 24, 39, 0.6) 50%,
+    rgba(15, 23, 42, 0.7) 100%
   );
   position: relative;
   overflow: hidden;
@@ -365,4 +365,48 @@
 .particle-green {
   background: rgba(34, 197, 94, 0.45);
   box-shadow: 0 0 4px rgba(34, 197, 94, 0.6);
+}
+
+@theme inline {
+  --animate-first: moveVertical 30s ease infinite;
+  --animate-second: moveInCircle 20s reverse infinite;
+  --animate-third: moveInCircle 40s linear infinite;
+  --animate-fourth: moveHorizontal 40s ease infinite;
+  --animate-fifth: moveInCircle 20s ease infinite;
+}
+
+@keyframes moveHorizontal {
+  0% {
+    transform: translateX(-50%) translateY(-10%);
+  }
+  50% {
+    transform: translateX(50%) translateY(10%);
+  }
+  100% {
+    transform: translateX(-50%) translateY(-10%);
+  }
+}
+
+@keyframes moveInCircle {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes moveVertical {
+  0% {
+    transform: translateY(-50%);
+  }
+  50% {
+    transform: translateY(50%);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
 }
