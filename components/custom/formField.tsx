@@ -20,18 +20,22 @@ const FormField = ({
   <Controller
     name={name}
     control={control}
-    render={({ field }) => (
+    render={({ field, fieldState }) => (
       <FormItem>
-        <FormLabel className="md:text-lg lg:text-sm">{label}</FormLabel>
+        <FormLabel className="text-gray-300 font-medium">{label}</FormLabel>
         <FormControl>
           <Input
             placeholder={placeholder}
             {...field}
             type={type}
-            className="h-[7.5vh] md:h-[6.75vh] lg:h-[6.5vh] px-4 focus:outline-none focus:ring-2 focus:ring-green-500 !ring-green-400/90 my-2 placeholder:text-base md:placeholder:text-lg lg:placeholder:text-sm"
+            className={`h-12 px-4 bg-white/5 border rounded-lg text-white placeholder:text-gray-500 focus:outline-none hover:border-white/30 transition-all duration-200 focus:bg-white/10 ${
+              fieldState.error
+                ? "border-red-400 focus:border-red-400"
+                : "border-white/20 focus:border-green-500"
+            }`}
           />
         </FormControl>
-        <FormMessage />
+        <FormMessage className="text-red-400 text-sm mt-1 font-medium" />
       </FormItem>
     )}
   />

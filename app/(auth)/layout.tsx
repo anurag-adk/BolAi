@@ -10,7 +10,7 @@ const AuthLayout = async ({ children }: { children: ReactNode }) => {
     redirect("/home");
   }
   return (
-    <div className="min-h-screen overflow-y-auto w-full flex flex-col justify-center items-center">
+    <div className="min-h-screen overflow-y-auto w-full flex flex-col justify-center items-center bg-gray-900 hero-gradient hero-gradient-overlay floating-lights relative">
       {children}
     </div>
   );
