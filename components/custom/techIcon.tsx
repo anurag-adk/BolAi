@@ -221,7 +221,7 @@ const TechIcon = ({ techStack }: { techStack: string }) => {
     <>
       {Icon ? (
         <div className="relative group">
-          <Icon className="text-xl md:text-3xl lg:text-xl font-semibold text-white mr-2" />
+          <Icon className="text-xl md:text-3xl lg:text-2xl font-semibold text-white mr-2" />
           <span className="absolute -top-7 md:-top-10 lg:-top-7 left-1/2 -translate-x-1/2 bg-green-600/80 text-white text-sm md:text-lg lg:text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">
             {key}
           </span>

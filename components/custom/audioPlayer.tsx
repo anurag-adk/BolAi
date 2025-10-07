@@ -8,11 +8,13 @@ type AudioPlayerProps = {
 const AudioPlayer = ({ src }: AudioPlayerProps) => {
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  const handlePlay = () => {
+  const handlePlay = (e: React.MouseEvent) => {
+    e.stopPropagation();
     audioRef.current?.play();
   };
 
-  const handlePause = () => {
+  const handlePause = (e: React.MouseEvent) => {
+    e.stopPropagation();
     audioRef.current?.pause();
   };
 

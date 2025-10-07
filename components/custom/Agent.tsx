@@ -1,6 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 //CSR:
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { MdCallEnd, MdCall } from "react-icons/md";
 import { ImSpinner8 } from "react-icons/im";
@@ -8,6 +11,7 @@ import { FiMessageCircle } from "react-icons/fi";
 import { RiMicAiLine } from "react-icons/ri";
 import { useRouter } from "next/navigation";
 import { vapi } from "@/lib/vapi.sdk";
+import { toast } from "sonner";
 
 //ShadCn Components:
 import {
@@ -31,6 +35,8 @@ interface AiInterviewProps {
   type: string;
   userId: string;
   profilePic: string;
+  interviewId?: string;
+  questions?: any[];
 }
 
 enum CallStatus {
@@ -58,7 +64,14 @@ type voiceId =
   | "Harry"
   | "Paige";
 
-const Agent = ({ userName, type, userId, profilePic }: AiInterviewProps) => {
+const Agent = ({
+  userName,
+  type,
+  userId,
+  profilePic,
+  interviewId,
+  questions,
+}: AiInterviewProps) => {
   //useState Hook:
   const router = useRouter();
   const [speakingRole, setSpeakingRole] = useState<"user" | "assistant" | null>(
@@ -70,7 +83,8 @@ const Agent = ({ userName, type, userId, profilePic }: AiInterviewProps) => {
     null
   );
   const latestMessage = messages[messages.length - 1]?.content;
-  const [voiceId, setVoiceId] = useState<voiceId>("Neha");
+  const [voiceId, setVoiceId] = useState<voiceId>("Rohan");
+  const [open, setOpen] = useState(false);
 
   //useEffect Hook executed in the initial mounting:
   useEffect(() => {
@@ -451,85 +465,113 @@ const Agent = ({ userName, type, userId, profilePic }: AiInterviewProps) => {
         .off("speech-end", onSpeechEnd)
         .off("error", onError);
     };
-  }, [userId, userName]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [userId, userName]);
+
+  //Function to generate the feedback of the interview session:
+  const handleGenerateFeedback = async (messages: SavedMessage[]) => {
+    console.log("Generate feedback here.");
+    //TODO: Create a server action that generates the feedback
+    const { success, id } = {
+      success: true,
+      id: "feedback-id",
+    };
+    //If the feedback is generated successfully push into the feedback page:
+    if (success && id) {
+      toast.success("Successfully generated the feedback!");
+      router.push(`/interview/${interviewId}/feedback`);
+    } else {
+      toast.error("Error saving feedback");
+      router.push("/home");
+    }
+  };
 
   //useEffect Hook when anything changes:
   useEffect(() => {
     if (callStatus === CallStatus.FINISHED) {
-      router.push("/home");
+      //After finishing the interview if the type is generate than go to home.
+      if (type === "generate") {
+        router.push("/home");
+      }
+      //After finishing the interview if the type is interview than generate the feedbacks.
+      else {
+        handleGenerateFeedback(messages);
+      }
     }
-  }, [messages, callStatus, type, userId, router]);
+  }, [messages, callStatus, type, userId, router, handleGenerateFeedback]);
 
   const handleCall = async () => {
     console.log("Starting Vapi call...");
-    console.log("Call parameters:", {
-      assistantId: process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID,
-      userName,
-      userId,
-      apiKey: process.env.NEXT_PUBLIC_VAPI_API_KEY ? "Present" : "Missing",
-    });
-
     setCallStatus(CallStatus.CONNECTING);
-
-    try {
-      try {
-        console.log("🎤 Checking microphone permissions...");
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        });
-        stream.getTracks().forEach((track) => track.stop()); // Stop the test stream
-        console.log("✅ Microphone access granted");
-      } catch (micError) {
-        console.error("❌ Microphone access denied:", micError);
-        alert(
-          "Please allow microphone access for the interview to work properly."
-        );
-        setCallStatus(CallStatus.INACTIVE);
-        return;
-      }
-
-      if (!userName || userName.trim() === "") {
-        throw new Error("userName is required but not provided");
-      }
-      if (!userId || userId.trim() === "") {
-        throw new Error("userId is required but not provided");
-      }
-      await vapi.start(process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID!, {
-        variableValues: {
-          username: userName,
-          userid: userId,
-        },
-        voice: {
-          voiceId,
-          provider: "vapi",
-        },
+    if (type === "generate") {
+      console.log("Call parameters:", {
+        assistantId: process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID,
+        userName,
+        userId,
+        apiKey: process.env.NEXT_PUBLIC_VAPI_API_KEY ? "Present" : "Missing",
       });
-      console.log("Vapi call initiated successfully");
-    } catch (error: unknown) {
-      const err = error as Error & {
-        response?: {
-          status: number;
-          statusText: string;
-          data: unknown;
-        };
-        code?: string;
-      };
-      console.error("Vapi call failed:");
-      console.error("Error message:", err.message);
-      console.error("Error type:", typeof err);
-      console.error("Full error object:", err);
-      // Check for specific error types
-      if (err.response) {
-        console.error("HTTP Response Error:");
-        console.error("- Status:", err.response.status);
-        console.error("- Status Text:", err.response.statusText);
-        console.error("- Data:", err.response.data);
+      try {
+        if (!userName || userName.trim() === "") {
+          throw new Error("userName is required but not provided");
+        }
+        if (!userId || userId.trim() === "") {
+          throw new Error("userId is required but not provided");
+        }
+        await vapi.start(process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID!, {
+          variableValues: {
+            username: userName,
+            userid: userId,
+          },
+          voice: {
+            voiceId,
+            provider: "vapi",
+          },
+        });
+        toast.success("Vapi call initiated successfully");
+      } catch (error: any) {
+        setCallStatus(CallStatus.INACTIVE);
+        alert(
+          `Failed to start call: ${error.message}` || "Unknown error occurred"
+        );
+        toast.error(
+          `Failed to start call: ${error.message}` || "Unknown error occurred"
+        );
       }
-      if (err.code) {
-        console.error("Error Code:", err.code);
+    } else {
+      console.log("Call parameters:", {
+        assistantId: process.env.NEXT_PUBLIC_VAPI_CONVERSATION_ASSISTANT_ID,
+        userName,
+        userId,
+        apiKey: process.env.NEXT_PUBLIC_VAPI_API_KEY ? "Present" : "Missing",
+      });
+      try {
+        let formattedQuestions = "";
+        if (questions) {
+          formattedQuestions = questions
+            .map((question) => `- ${question}`)
+            .join("\n");
+        }
+        await vapi.start(
+          process.env.NEXT_PUBLIC_VAPI_CONVERSATION_ASSISTANT_ID!,
+          {
+            variableValues: {
+              questions: formattedQuestions,
+            },
+            voice: {
+              voiceId,
+              provider: "vapi",
+            },
+          }
+        );
+        toast.success("Vapi call initiated successfully");
+      } catch (error: any) {
+        setCallStatus(CallStatus.INACTIVE);
+        alert(
+          `Failed to start call: ${error.message}` || "Unknown error occurred"
+        );
+        toast.error(
+          `Failed to start call: ${error.message}` || "Unknown error occurred"
+        );
       }
-      setCallStatus(CallStatus.INACTIVE);
-      alert(`Failed to start call: ${err.message || "Unknown error occurred"}`);
     }
   };
 
@@ -682,7 +724,7 @@ const Agent = ({ userName, type, userId, profilePic }: AiInterviewProps) => {
             <>
               {callStatus !== "CONNECTING" ? (
                 <>
-                  <AlertDialog>
+                  <AlertDialog open={open} onOpenChange={setOpen}>
                     <AlertDialogTrigger asChild>
                       {/* Alert Trigger */}
                       <div className="w-[28.5%] md:w-[28.5%] h-[9.5vh] lg:w-[14.5%] lg:h-[7.5vh] rounded-md flex justify-center items-center text-white text-lg transition-all ease-in-out duration-150 hover:scale-110 aspect-square hover:cursor-pointer mr-6 bg-gradient-to-r from-slate-700/90 via-slate-800/90 to-slate-900/90 hover:from-slate-600/95 hover:via-slate-700/95 hover:to-slate-800/95 border-1 border-emerald-400/60 shadow-md shadow-emerald-400/30 ">
@@ -710,8 +752,15 @@ const Agent = ({ userName, type, userId, profilePic }: AiInterviewProps) => {
                             // Main Div
                             <div
                               key={voice.name}
-                              className="bg-transparent p-3 mt-2 rounded-md w-full flex flex-col justify-start items-start gap-y-4 transition-all duration-150 hover:bg-gray-800/80 hover:cursor-pointer"
-                              onClick={() => setVoiceId(voice.name as voiceId)}
+                              className={`p-3 mt-2 rounded-md w-full flex flex-col justify-start items-start gap-y-4 transition-all duration-150 hover:cursor-pointer ${
+                                voiceId === voice.name
+                                  ? "bg-emerald-600/30 border border-emerald-400/40"
+                                  : "bg-transparent hover:bg-gray-800/80"
+                              }`}
+                              onClick={() => {
+                                setVoiceId(voice.name as voiceId);
+                                setOpen(false);
+                              }}
                             >
                               {/* Div for Image, Name And Audio */}
                               <div className="w-full flex justify-start items-center gap-x-4 flex-wrap gap-y-2">
@@ -732,19 +781,25 @@ const Agent = ({ userName, type, userId, profilePic }: AiInterviewProps) => {
                                 {/* For The Audio */}
                                 <AudioPlayer src={voice.audio} />
                               </div>
-                              {/* Div For Default tag, Gender, Accent */}
+                              {/* Div For Default tag, Gender, Accent, Selected Option */}
                               <div className="w-full flex justify-start items-center gap-x-5 flex-wrap gap-y-1.5">
                                 {/* Div For Default */}
                                 {voice.default ? (
-                                  <div className="text-sm text-white text-semibold w-18 p-1 rounded-sm flex justify-center items-center bg-gradient-to-r from-green-500/80 via-emerald-500/80 to-teal-500/80">
+                                  <div className="text-sm text-white font-semibold w-18 p-1 rounded-sm flex justify-center items-center bg-gradient-to-r from-green-500/80 via-emerald-500/80 to-teal-500/80">
                                     Default
                                   </div>
                                 ) : (
                                   <></>
                                 )}
+                                {/* Div For Selected Option */}
+                                {voiceId === voice.name && (
+                                  <div className="text-sm text-white font-medium w-18 p-1 rounded-sm flex justify-center items-center bg-gradient-to-r from-emerald-500/20 via-green-500/20 to-teal-500/20">
+                                    Selected
+                                  </div>
+                                )}
                                 {/* Div For Gender */}
                                 <div
-                                  className={`text-sm text-white text-semibold p-1 w-16 rounded-sm flex justify-center items-center ${
+                                  className={`text-sm text-white p-1 w-16 rounded-sm flex justify-center items-center ${
                                     voice.gender === "Female"
                                       ? "font-medium bg-pink-400/20 text-pink-300 border border-pink-400/30"
                                       : "font-medium bg-blue-400/20 text-blue-300 border border-blue-400/30"
@@ -753,7 +808,7 @@ const Agent = ({ userName, type, userId, profilePic }: AiInterviewProps) => {
                                   {voice.gender}
                                 </div>
                                 {/* Div For Accent */}
-                                <div className="text-sm text-semibold p-1 rounded-sm flex justify-center items-center font-medium bg-cyan-400/20 text-cyan-300 border border-cyan-400/30">
+                                <div className="text-sm p-1 rounded-sm flex justify-center items-center font-medium bg-cyan-400/20 text-cyan-300 border border-cyan-400/30">
                                   {voice.accent}
                                 </div>
                               </div>

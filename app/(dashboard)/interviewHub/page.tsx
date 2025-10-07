@@ -3,10 +3,8 @@
 //Imports:
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import {
-  fetchLatestGeneratedInterviews,
-  getCurrentUser,
-} from "@/lib/actions/auth.action";
+import { getCurrentUser } from "@/lib/actions/auth.action";
+import { fetchLatestGeneratedInterviews } from "@/lib/actions/general.action";
 import InterviewCard from "@/components/custom/interviewCard";
 //React Components:
 import { useState, useEffect } from "react";

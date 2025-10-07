@@ -4,13 +4,13 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import React from "react";
 import InterviewCard from "@/components/custom/interviewCard";
+import { getCurrentUser } from "@/lib/actions/auth.action";
+import { FaArrowRight } from "react-icons/fa";
+import { BackgroundLines } from "@/components/ui/background-lines";
 import {
   fetchGeneratedInterviews,
   fetchLatestGeneratedInterviews,
-  getCurrentUser,
-} from "@/lib/actions/auth.action";
-import { FaArrowRight } from "react-icons/fa";
-import { BackgroundLines } from "@/components/ui/background-lines";
+} from "@/lib/actions/general.action";
 
 const HomePage = async () => {
   //Get Current User:
