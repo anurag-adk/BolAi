@@ -220,16 +220,16 @@ const TechIcon = ({ techStack }: { techStack: string }) => {
   return (
     <>
       {Icon ? (
-        <div className="relative group">
-          <Icon className="text-xl md:text-3xl lg:text-2xl font-semibold text-white mr-2" />
-          <span className="absolute -top-7 md:-top-10 lg:-top-7 left-1/2 -translate-x-1/2 bg-green-600/80 text-white text-sm md:text-lg lg:text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">
+        <div className="relative">
+          <Icon className="peer text-2xl md:text-4xl lg:text-3xl font-semibold text-white mr-2" />
+          <span className="pointer-events-none absolute -top-7 md:-top-10 lg:-top-7 left-1/2 -translate-x-1/2 bg-green-600/80 text-white text-sm md:text-lg lg:text-sm px-2 py-1 rounded opacity-0 transition peer-hover:opacity-100">
             {key}
           </span>
         </div>
       ) : (
-        <div className="relative group">
-          <MdCode className="text-xl md:text-3xl lg:text-xl font-semibold text-white mr-2" />
-          <span className="absolute -top-7 md:-top-10 lg:-top-7 left-1/2 -translate-x-1/2 bg-green-600/80 text-white text-sm md:text-lg lg:text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">
+        <div className="relative">
+          <MdCode className="peer text-xl md:text-3xl lg:text-xl font-semibold text-white mr-2" />
+          <span className="pointer-events-none absolute -top-7 md:-top-10 lg:-top-7 left-1/2 -translate-x-1/2 bg-green-600/80 text-white text-sm md:text-lg lg:text-sm px-2 py-1 rounded opacity-0 transition peer-hover:opacity-100">
             {displayName}
           </span>
         </div>

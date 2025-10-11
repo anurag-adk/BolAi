@@ -1,9 +1,22 @@
 //Lint Fixes:
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 //Server Side Rendering
 "use server";
+
 //Imports:
 import { db } from "@/firebase/admin";
+import { generateText } from "ai";
+import { groq } from "@ai-sdk/groq";
+import { Feedback, feedbackSchema } from "@/constants/index";
+
+//Types:
+type CreateFeedbackParams = {
+  interviewId: string;
+  userId: string;
+  transcript: { role: string; content: string }[];
+};
+
 //This will help to fetch the generated interviews for the current user:
 export async function fetchGeneratedInterviews(
   userId: string
@@ -107,8 +120,11 @@ export const fetchInterviewsById = async (interviewId: string) => {
     if (!interview) {
       return null;
     }
-    //4.Return the value:
-    return interview.data();
+    //4.Return the value with ID:
+    return {
+      id: interview.id,
+      ...interview.data(),
+    };
   } catch (error: any) {
     console.error("Error fetching the interviews: ", error.message || error);
     console.error(
@@ -116,5 +132,90 @@ export const fetchInterviewsById = async (interviewId: string) => {
       interviewId
     );
     return null;
+  }
+};
+//This will create a feedback for the interview done:
+export const createFeedback = async (params: CreateFeedbackParams) => {
+  try {
+    const { interviewId, userId, transcript } = params;
+    const formattedTranscript = transcript
+      .map(
+        (sentence: { role: string; content: string }) =>
+          `- ${sentence.role}: ${sentence.content} \n`
+      )
+      .join("");
+    const { text: feedbackText } = await generateText({
+      model: groq("llama-3.3-70b-versatile"),
+      prompt: `You are an AI interviewer analyzing a mock interview. Your task is to evaluate the candidate based on structured categories. Be thorough and detailed in your analysis. Don't be lenient with the candidate. If there are mistakes or areas for improvement, point them out.
+
+      Return the feedback as a valid JSON object matching this exact structure:
+
+      {
+        "totalScore": number,
+        "categorySchema": [
+          { "name": "Understanding & Relevance", "score": number, "comment": string },
+          { "name": "Depth of Knowledge & Accuracy", "score": number, "comment": string },
+          { "name": "Problem-Solving & Reasoning Ability", "score": number, "comment": string },
+          { "name": "Communication & Articulation", "score": number, "comment": string },
+          { "name": "Professionalism & Attitude", "score": number, "comment": string }
+        ],
+        "strengths": [string],
+        "areasForImprovement": [string],
+        "finalAssessment": string
+      }
+      
+      Transcript:
+      ${formattedTranscript}
+
+      Please score the candidate from 0 to 100 in the following areas. Do not add categories other than the ones provided:
+        - **Understanding & Relevance**: How well the candidate comprehends the question and provides a relevant answer.
+        - **Depth of Knowledge & Accuracy**: The correctness, precision, and completeness of the information or logic provided.
+        - **Problem-Solving & Reasoning Ability**: How effectively the candidate applies logical thinking or creativity to find and justify solutions.
+        - **Communication & Articulation**: How clearly, confidently, and fluently the candidate communicates.
+        - **Professionalism & Attitude**: How the candidate conducts themselves politeness, tone, patience, and enthusiasm.
+
+      `,
+    });
+    // Clean and parse JSON safely
+    let data: Feedback | null = null;
+    try {
+      const cleaned = feedbackText
+        .trim()
+        .replace(/```json/g, "")
+        .replace(/```/g, "");
+      data = feedbackSchema.parse(JSON.parse(cleaned));
+    } catch (error) {
+      console.error("Failed to parse AI feedback:", error);
+      return {
+        success: false,
+        message:
+          "There was error generating the feedback for the user's interview.",
+      };
+    }
+    //Adding the data or object into db:
+    const feedback = await db.collection("feedback").add({
+      interviewId,
+      userId,
+      totalScore: data.totalScore,
+      categoryScores: data.categorySchema,
+      strengths: data.strengths,
+      areasForImprovement: data.areasForImprovement,
+      finalAssessment: data.finalAssessment,
+      createdAt: new Date().toISOString(),
+    });
+
+    return {
+      success: true,
+      feedbackId: feedback.id,
+    };
+  } catch (error: any) {
+    console.error(
+      "Error saving the feedback for the interview: ",
+      error.message || error
+    );
+    return {
+      success: false,
+      message: "Error saving the feedback for the interview.",
+    };
   }
 };

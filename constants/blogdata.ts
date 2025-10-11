@@ -10,12 +10,7 @@ export const blogs: Blog[] = [
       "Mock interviews let you rehearse job interviews in a low-stakes setting to build confidence, spot weaknesses, and reduce anxiety. Discover 5 key benefits, real success stories, and how 24/7 AI coaching can make practice accessible anytime:contentReference[oaicite:55]{index=55}:contentReference[oaicite:56]{index=56}.",
     date: "2025-09-12",
     readingTime: 8,
-    tags: [
-      "mock interview practice",
-      "job interview tips",
-      "online interview practice",
-      "interview anxiety help",
-    ],
+    tags: ["mock interview", "interview tips"],
   },
   {
     slug: "ai-vs-human-interviews-practicing-with-ai-makes-you-better",
@@ -27,12 +22,7 @@ export const blogs: Blog[] = [
       "Learn how AI interviewing works and why companies use it to screen candidates. Explore the benefits of AI mock interview practice — judgment-free zones, unlimited tries, instant feedback — and common pitfalls to avoid:contentReference[oaicite:57]{index=57}:contentReference[oaicite:58]{index=58}.",
     date: "2025-09-12",
     readingTime: 8,
-    tags: [
-      "AI interview preparation",
-      "AI mock interview",
-      "interview skills training",
-      "job interview tips",
-    ],
+    tags: ["AI interview prep", "AI mock interview"],
   },
   {
     slug: "nervous-to-ace-7-day-interview-skills-plan",
@@ -44,12 +34,7 @@ export const blogs: Blog[] = [
       "Follow this 7-day step-by-step plan to conquer interview fear: from identifying anxieties and mastering basic questions, to advanced scenarios and final mock interviews. Uses psychology and coaching tips to boost confidence and body language:contentReference[oaicite:59]{index=59}:contentReference[oaicite:60]{index=60}.",
     date: "2025-09-12",
     readingTime: 9,
-    tags: [
-      "Interview Anxiety",
-      "Job Interview Tips",
-      "Interview Skills",
-      "Mock Interviews",
-    ],
+    tags: ["Interview Anxiety", "Job Interview Tips"],
   },
   {
     slug: "common-interview-mistakes-and-mock-interviews",
@@ -61,11 +46,7 @@ export const blogs: Blog[] = [
       "Discover the top 5 interview blunders – from not researching the company to poor body language – and see how mock interviews train you to avoid each. Learn tips backed by career experts on concise answers, asking questions, and projecting confidence:contentReference[oaicite:61]{index=61}:contentReference[oaicite:62]{index=62}.",
     date: "2025-09-12",
     readingTime: 7,
-    tags: [
-      "job interview tips",
-      "mock interview practice",
-      "interview skills training",
-    ],
+    tags: ["job interview tips", "mock interview practice"],
   },
   {
     slug: "friends-vs-formal-mock-interview",
@@ -77,10 +58,6 @@ export const blogs: Blog[] = [
       "Understand the difference between casual practice and structured mock interviews. Learn why professional feedback, realistic settings, and even AI tools outperform just quizzing friends – and how career services strongly recommend formal mock interviews for real preparation:contentReference[oaicite:63]{index=63}:contentReference[oaicite:64]{index=64}.",
     date: "2025-09-12",
     readingTime: 7,
-    tags: [
-      "mock interview practice",
-      "AI mock interview",
-      "job interview tips",
-    ],
+    tags: ["mock interview practice", "AI mock interview"],
   },
 ];

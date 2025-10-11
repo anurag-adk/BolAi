@@ -1,3 +1,5 @@
+import z from "zod";
+
 export const myInterviews = [
   {
     id: "1",
@@ -141,3 +143,27 @@ export const dummyInterviews = [
     createdAt: "2025-07-06T08:45:00.000Z",
   },
 ];
+
+export const feedbackSchema = z.object({
+  totalScore: z.number(), //Out of 100 marks
+  categorySchema: z
+    .array(
+      z.object({
+        name: z.enum([
+          "Understanding & Relevance",
+          "Depth of Knowledge & Accuracy",
+          "Problem-Solving & Reasoning Ability",
+          "Communication & Articulation",
+          "Professionalism & Attitude",
+        ]),
+        score: z.number(),
+        comment: z.string(),
+      })
+    )
+    .length(5), // The total scoring will be done in this 5 areas.
+  strengths: z.array(z.string()), //Array of the strengths of the users answer.
+  areasForImprovement: z.array(z.string()), //Array of the weakness of the users answer.
+  finalAssessment: z.string(), //The recommendation that will be provided.
+});
+
+export type Feedback = z.infer<typeof feedbackSchema>;

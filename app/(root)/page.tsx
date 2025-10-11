@@ -51,7 +51,7 @@ const HomePage = () => {
 
       <Particles />
       {/* Features Section */}
-      <div className="w-full h-[300vh] md:h-[135vh] lg:h-[120vh] flex flex-col justify-center items-center mt-4 overflow-y-auto">
+      <div className="w-full min-h-screen flex flex-col justify-center items-center mt-4">
         {/* Title */}
         <div className="text-center mb-8">
           <h2 className="text-4xl md:text-5xl lg:text-4xl font-bold text-white mb-4">
@@ -116,7 +116,7 @@ const HomePage = () => {
       <Particles />
 
       {/* How It Works Section */}
-      <div className="w-full mt-16 pb-32 bg-gray-900 relative overflow-hidden">
+      <div className="w-full pb-32 bg-gray-900 relative overflow-x-hidden">
         <div className="max-w-7xl mx-auto px-4 relative z-10">
           {/* Title */}
           <div className="text-center mb-8">
@@ -135,7 +135,7 @@ const HomePage = () => {
           </div>
 
           {/* Cards Display */}
-          <div className="grid grid-cols-1 md:grid-cols-3 mt-24 gap-6 lg:gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
             <HowItWorksCard
               motif={1}
               title={"Set Your Profile"}
