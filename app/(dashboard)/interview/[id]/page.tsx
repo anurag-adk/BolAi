@@ -7,6 +7,7 @@ import { getCurrentUser } from "@/lib/actions/auth.action";
 import Link from "next/link";
 import { PiBrainDuotone } from "react-icons/pi";
 import { RiChatVoiceAiFill } from "react-icons/ri";
+import { FaQuestion } from "react-icons/fa";
 
 const InterviewPage = async ({ params }: { params: { id: string } }) => {
   const { id } = await params;
@@ -40,7 +41,7 @@ const InterviewPage = async ({ params }: { params: { id: string } }) => {
           Back to home
         </Link>
         {/* Banner */}
-        <div className="w-[95%] backdrop-blur-xl bg-gradient-to-br from-slate-800/40 via-slate-900/30 to-slate-950/10 shadow-[inset_0_0_15px_rgba(34,197,94,0.3),_0_0_15px_rgba(34,197,94,0.3)] p-3 flex flex-col justify-start items-center lg:flex-row lg:justify-between lg:items-center gap-y-4 gap-x-6 lg:gap-y-0 py-10 px-6 lg:px-12 mb-6 border-1 border-white/30 rounded-2xl">
+        <div className="w-[95%] md:w-[85%] lg:w-[95%] backdrop-blur-xl bg-gradient-to-br from-slate-800/40 via-slate-900/30 to-slate-950/10 shadow-[inset_0_0_15px_rgba(34,197,94,0.3),_0_0_15px_rgba(34,197,94,0.3)] p-3 flex flex-col justify-start items-center lg:flex-row lg:justify-between lg:items-center gap-y-4 gap-x-6 lg:gap-y-0 py-10 px-6 lg:px-12 mb-6 border-1 border-white/30 rounded-2xl">
           {/* Companies Logo */}
           <div className="w-[32%] h-[14vh] md:w-[26.5%] md:h-[10.5vh] lg:w-[9.5%] lg:h-[12vh] rounded-xl border border-slate-500/40 bg-slate-700/60 shadow-inner flex flex-row justify-center items-center backdrop-blur-md">
             <div
@@ -53,7 +54,7 @@ const InterviewPage = async ({ params }: { params: { id: string } }) => {
               }}
             ></div>
           </div>
-          {/* Position Title and TechStack Icon */}
+          {/* Position Title and Tags */}
           <div className="w-full bg-transparent flex flex-col justify-start items-start p-2 ml-2">
             <div className="text-[0.7rem] md:text-sm tracking-wide p-2 px-3 bg-gray-800/70 text-gray-200 rounded-md font-semibold border border-white/10">
               INTERVIEW PREPARATION
@@ -61,7 +62,7 @@ const InterviewPage = async ({ params }: { params: { id: string } }) => {
             {/* Position Title */}
             <div
               className="font-extrabold text-white w-full leading-tight mt-2
-             text-3xl md:text-5xl lg:text-4xl whitespace-nowrap overflow-hidden text-ellipsis drop-shadow-[0_6px_24px_rgba(16,185,129,0.25)]"
+             text-3xl md:text-3xl lg:text-4xl whitespace-nowrap overflow-hidden text-ellipsis drop-shadow-[0_6px_24px_rgba(16,185,129,0.25)]"
             >
               {interview.role
                 .split(" ")
@@ -70,8 +71,8 @@ const InterviewPage = async ({ params }: { params: { id: string } }) => {
                 )
                 .join(" ")}
             </div>
-            {/* Tag for the interview And difficulty level */}
-            <div className="w-full flex justify-start items-center gap-x-6 mt-2 text-gray-300">
+            {/* Tag for the interview, it's type and no of questions: */}
+            <div className="w-full flex flex-col justify-start items-start lg:flex-row lg:justify-start lg:items-center lg:gap-x-4 mt-2 text-gray-300">
               <div className="flex justify-start items-center">
                 <PiBrainDuotone className="mr-2 text-emerald-300" />
                 <div className="text-sm md:text-base lg:text-sm text-gray-400">
@@ -82,6 +83,12 @@ const InterviewPage = async ({ params }: { params: { id: string } }) => {
                 <RiChatVoiceAiFill className="mr-2 text-indigo-300" />
                 <div className="text-sm md:text-base lg:text-sm text-gray-400">
                   {interview.type} Interview
+                </div>
+              </div>
+              <div className="flex justify-start items-center">
+                <FaQuestion className="mr-2 text-amber-400" />
+                <div className="text-sm md:text-base lg:text-sm text-gray-400">
+                  {interview.questions.length} AI Questions
                 </div>
               </div>
             </div>

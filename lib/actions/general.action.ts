@@ -8,7 +8,7 @@
 import { db } from "@/firebase/admin";
 import { generateText } from "ai";
 import { groq } from "@ai-sdk/groq";
-import { Feedback, feedbackSchema } from "@/constants/index";
+import { Feedback, feedbackSchema, FeedbackWithId } from "@/constants/index";
 
 //Types:
 type CreateFeedbackParams = {
@@ -18,9 +18,12 @@ type CreateFeedbackParams = {
 };
 
 //This will help to fetch the generated interviews for the current user:
-export async function fetchGeneratedInterviews(
-  userId: string
-): Promise<any[] | null> {
+export async function fetchGeneratedInterviews(params: {
+  userId: string;
+  limit?: number;
+}): Promise<any[] | null> {
+  //Access the data:
+  const { userId, limit } = params;
   try {
     // Validate userId parameter
     if (!userId || userId === undefined || userId === null) {
@@ -28,11 +31,16 @@ export async function fetchGeneratedInterviews(
       return null;
     }
     //Fetching the interviews from the datbase
-    const interviews = await db
+    let query = db
       .collection("interviews")
       .where("userId", "==", userId)
-      .orderBy("createdAt", "desc")
-      .get();
+      .orderBy("createdAt", "desc");
+    //If there is a limit fetching the interview:
+    if (limit && limit > 0) {
+      query = query.limit(limit);
+    }
+    //Execute the query:
+    const interviews = await query.get();
     //If Interviews are empty then return a friendly message:
     if (interviews.empty || interviews.docs.length == 0) {
       return null;
@@ -152,7 +160,7 @@ export const createFeedback = async (params: CreateFeedbackParams) => {
 
       {
         "totalScore": number,
-        "categorySchema": [
+        "categoryScores": [
           { "name": "Understanding & Relevance", "score": number, "comment": string },
           { "name": "Depth of Knowledge & Accuracy", "score": number, "comment": string },
           { "name": "Problem-Solving & Reasoning Ability", "score": number, "comment": string },
@@ -197,7 +205,7 @@ export const createFeedback = async (params: CreateFeedbackParams) => {
       interviewId,
       userId,
       totalScore: data.totalScore,
-      categoryScores: data.categorySchema,
+      categoryScores: data.categoryScores,
       strengths: data.strengths,
       areasForImprovement: data.areasForImprovement,
       finalAssessment: data.finalAssessment,
@@ -219,3 +227,137 @@ export const createFeedback = async (params: CreateFeedbackParams) => {
     };
   }
 };
+//This will fetch the feedback info from db and render to the user:
+export async function fetchFeedbackById(params: {
+  interviewId: string;
+  userId: string;
+  feedbackId?: string;
+}) {
+  try {
+    const { interviewId, userId, feedbackId } = params;
+    let feedbackDoc: FeedbackWithId | null = null;
+
+    if (feedbackId) {
+      const docSnap = await db.collection("feedback").doc(feedbackId).get();
+
+      if (!docSnap.exists) {
+        return {
+          success: false,
+          message: "The feedback doesn't exist in the db.",
+        };
+      }
+
+      feedbackDoc = {
+        id: docSnap.id,
+        ...(docSnap.data() as Omit<FeedbackWithId, "id">),
+      };
+    } else {
+      const querySnap = await db
+        .collection("feedback")
+        .where("userId", "==", userId)
+        .where("interviewId", "==", interviewId)
+        .limit(1)
+        .get();
+
+      if (querySnap.empty) {
+        return {
+          success: false,
+          message: "No feedback found for this user and interview.",
+        };
+      }
+
+      const doc = querySnap.docs[0];
+      feedbackDoc = {
+        id: doc.id,
+        ...(doc.data() as Omit<FeedbackWithId, "id">),
+      };
+    }
+
+    if (feedbackDoc.interviewId !== interviewId) {
+      return {
+        success: false,
+        message: "Feedback does not belong to this interview.",
+      };
+    }
+
+    if (feedbackDoc.userId !== userId) {
+      return {
+        success: false,
+        message: "Feedback does not belong to this user.",
+      };
+    }
+
+    return feedbackDoc;
+  } catch (error) {
+    console.error("Error while fetching feedback info.", error);
+    return {
+      success: false,
+      message: "Error while fetching the feedback info.",
+    };
+  }
+}
+
+//This will help to fetch all the necessary feedbacks for the user, so if user wants to access his feedbacks can easily do it.
+export async function fetchFeedbacksForUser(userId: string) {
+  try {
+    // Validate userId parameter:
+    if (!userId || userId === undefined || userId === null) {
+      console.error("fetchGeneratedInterviews: userId is undefined or null");
+      return {
+        success: false,
+        message: "Error, the userId provided was invalid.",
+      };
+    }
+    //Fetching the interview feedbacks from the db:
+    const feedbacks = await db
+      .collection("feedback")
+      .where("userId", "==", userId)
+      .orderBy("createdAt", "desc")
+      .get();
+    //If the feedbacks are empty then send a proper message:
+    if (feedbacks.docs.length <= 0 || feedbacks.empty) {
+      return {
+        success: false,
+        message: "Problem, while fetching the feedbacks.",
+      };
+    }
+    //Now, I want a populated data I want to get the interview information also from each of the feedbacks fetched for the user where both of them have a common field called userId.
+    const feedbacksWithInterviewsInfo = await Promise.all(
+      feedbacks.docs.map(async (doc) => {
+        const feedbackData = doc.data();
+        const interviewId = feedbackData.interviewId;
+        //Fetch the interview documents
+        const interviews = await db
+          .collection("interviews")
+          .doc(interviewId)
+          .get();
+        const interviewData = interviews.data();
+        //Return the mixed data:
+        return {
+          id: doc.id,
+          interviewId,
+          ...feedbackData,
+          interview: interviewData,
+        };
+      })
+    );
+    if (!feedbacksWithInterviewsInfo) {
+      return {
+        success: false,
+        message: "Error merging the feedbacks with interview information.",
+      };
+    }
+    //Return the data:
+    return {
+      success: true,
+      message: "Feedbacks with interview data fetched successfully.",
+      data: feedbacksWithInterviewsInfo,
+    };
+  } catch (error) {
+    console.error("Error while fetching the feedbacks.", error);
+    return {
+      success: false,
+      message: "Error while fetching the feedbacks.",
+    };
+  }
+}

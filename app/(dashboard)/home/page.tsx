@@ -32,7 +32,7 @@ const HomePage = async () => {
   //Parallel Data Fetching:
   const [userInterviews, communityInterviews] = await Promise.all([
     //Get The Current Users Interviews:
-    fetchGeneratedInterviews(user.id),
+    fetchGeneratedInterviews({ userId: user.id, limit: 6 }),
     //Get The Latest Interview From The Community:
     fetchLatestGeneratedInterviews({
       userId: user.id,
@@ -45,18 +45,20 @@ const HomePage = async () => {
   return (
     <div className="w-full min-h-screen flex flex-col justify-start items-center overflow-y-auto mt-4 px-5">
       {/* Banner And CTA */}
-      <BackgroundLines className="w-[95%] md:w-[98%] lg:w-[90%] h-[45vh] md:h-[38vh] lg:h-[40vh]">
-        <div className="w-full h-full bg-transparent rounded-md flex flex-col justify-start items-start md:flex-row md:justify-start md:items-center lg:flex-row lg:justify-start lg:items-center mb-4">
+      <BackgroundLines className="w-[95%] md:w-[98%] lg:w-[90%] h-[45vh] md:h-[38vh] lg:h-[40vh] mt-4">
+        <div className="w-full h-full bg-transparent rounded-md flex flex-col justify-around items-start md:flex-row md:justify-around md:items-center lg:flex-row lg:justify-around lg:items-center mb-4">
           {/* Banner Actions */}
           <div className="w-full lg:w-[55%] md:w-[58%] flex flex-col justify-center items-start lg:items-start md:items-start p-6 mt-2">
             {/* Title */}
             <div className="text-2xl md:text-3xl lg:text-3xl text-white font-semibold mb-4">
               Get Interview Ready with BolAi
             </div>
+
             {/* SubText */}
             <div className="text-md md:text-xl lg:text-md text-white mb-6">
               Practice on real interview questions & get instant feedback
             </div>
+
             {/* Button */}
             <Button
               asChild
@@ -67,11 +69,12 @@ const HomePage = async () => {
                 className="flex justify-center items-center"
               >
                 <div className="text-lg lg:text-sm text-white">
-                  Start an Interview
+                  Generate Interview
                 </div>
               </Link>
             </Button>
           </div>
+
           {/* Banner Image */}
           <div
             className="max-sm:hidden md:w-[40%] md:h-[32vh] lg:w-[20%] lg:h-[30vh]"
@@ -84,13 +87,29 @@ const HomePage = async () => {
           ></div>
         </div>
       </BackgroundLines>
+
       {/* Displaying the users Interviews */}
       <div className="w-[95%] md:w-[95%] lg:w-[90%] flex flex-col justify-start items-start mt-8 mb-4">
-        <div className="text-2xl md:text-3xl lg:text-2xl font-semibold text-white mb-4 md:mb-6 lg:mb-4">
-          My Interviews
+        <div className="w-full p-2 flex justify-start items-center mb-4 md:mb-6 lg:mb-4">
+          {/* Title */}
+          <div className="text-2xl md:text-3xl lg:text-2xl font-semibold text-white mr-8">
+            My Interviews
+          </div>
+          {/* View More CTA Button */}
+          <Button className="bg-green-600/80 h-[6.5vh] w-[38%] md:w-[38%] lg:w-[12.5%] rounded-md hover:cursor-pointer hover:bg-green-500/80 transition-all ease-in-out duration-150 hover:scale-105">
+            <Link
+              href="/myInterviews"
+              className="flex justify-center items-center"
+            >
+              <div className="font-semibold text-white mr-2 text-md md:text-xl lg:text-sm">
+                View More
+              </div>
+              <FaArrowRight className="font-semibold text-white" />
+            </Link>
+          </Button>
         </div>
         {/* Render The Interview Cards */}
-        <div className="w-full flex flex-col justify-start items-center lg:flex-row lg:justify-between lg:items-start lg:flex-wrap lg:gap-4 mb-4">
+        <div className="w-full grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-4 justify-items-start">
           {hasPastInterviews ? (
             userInterviews?.map((interview: any) => (
               <InterviewCard key={interview?.id} {...interview} />
@@ -124,7 +143,7 @@ const HomePage = async () => {
           </Button>
         </div>
         {/* Render The Interview Cards */}
-        <div className="w-full flex flex-col justify-start items-center lg:flex-row lg:justify-between lg:items-start lg:flex-wrap lg:gap-4 mb-4 mt-2">
+        <div className="w-full grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-4 justify-items-start">
           {hasPastCommunityInterviews ? (
             communityInterviews?.map((interview: any) => (
               <InterviewCard key={interview?.id} {...interview} />

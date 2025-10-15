@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+//CSR:
+"use client";
 //Imports:
 import { useState, useMemo } from "react";
 const useFilterInterview = (communityInterviews: any[]) => {

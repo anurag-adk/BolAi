@@ -146,7 +146,7 @@ export const dummyInterviews = [
 
 export const feedbackSchema = z.object({
   totalScore: z.number(), //Out of 100 marks
-  categorySchema: z
+  categoryScores: z
     .array(
       z.object({
         name: z.enum([
@@ -164,6 +164,12 @@ export const feedbackSchema = z.object({
   strengths: z.array(z.string()), //Array of the strengths of the users answer.
   areasForImprovement: z.array(z.string()), //Array of the weakness of the users answer.
   finalAssessment: z.string(), //The recommendation that will be provided.
+  id: z.string(),
+  interviewId: z.string(),
+  userId: z.string(),
+  createdAt: z.union([z.string(), z.date()]),
 });
 
 export type Feedback = z.infer<typeof feedbackSchema>;
+
+export type FeedbackWithId = Feedback & { id: string };

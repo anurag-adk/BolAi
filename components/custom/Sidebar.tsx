@@ -35,7 +35,7 @@ import { toast } from "sonner";
 //For Navigation
 import { redirect } from "next/navigation";
 import { usePathname } from "next/navigation";
-
+import { useRouter } from "next/navigation";
 interface User {
   id: string;
   name?: string;
@@ -49,6 +49,7 @@ const Sidebar = () => {
 
   //Constant for routing:
   const pathname = usePathname();
+  const router = useRouter();
 
   // Refs for scroll automation
   const navRefs = useRef<{ [key: string]: HTMLAnchorElement | null }>({});
@@ -119,7 +120,7 @@ const Sidebar = () => {
         {/* Logo and Title */}
         <div className="p-6 border-b border-gray-700 flex-shrink-0">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3 hover:cursor-pointer transition-all ease-in-out duration-150 hover:scale-105">
               {/* Logo */}
               <div
                 className="w-10 h-10"
@@ -129,6 +130,7 @@ const Sidebar = () => {
                   backgroundRepeat: "no-repeat",
                   backgroundPosition: "center",
                 }}
+                onClick={() => router.push("/home")}
               ></div>
               {/* Title */}
               <div className="text-2xl font-bold text-green-500">BolAi</div>
@@ -146,7 +148,7 @@ const Sidebar = () => {
         {/* Scrollable Content Container */}
         <div
           ref={scrollContainerRef}
-          className="flex-1 overflow-y-auto custom-scrollbar"
+          className="flex-1 overflow-y-auto custom-scrollbar bg-transparent"
           onWheel={(e) => e.stopPropagation()}
         >
           {/* Navigation Menu */}
@@ -160,10 +162,10 @@ const Sidebar = () => {
                 <div className="space-y-1">
                   {/* My Feedbacks Tab */}
                   <Link
-                    ref={setNavRef("/home")}
-                    href="/home"
+                    ref={setNavRef("/myFeedbacks")}
+                    href="/myFeedbacks"
                     className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
-                      pathname === "/home"
+                      pathname === "/myFeedbacks"
                         ? "text-white bg-gradient-to-r from-green-500/50 via-teal-500/50 to-emerald-500/50 py-2 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/50 scale-105"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
                     }`}
@@ -190,10 +192,10 @@ const Sidebar = () => {
 
                   {/* My Interviews */}
                   <Link
-                    ref={setNavRef("/my-interviews")}
-                    href="/my-interviews"
+                    ref={setNavRef("/myInterviews")}
+                    href="/myInterviews"
                     className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
-                      pathname === "/my-interviews"
+                      pathname === "/myInterviews"
                         ? "text-white bg-gradient-to-r from-green-500/50 via-teal-500/50 to-emerald-500/50 py-2 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/50 scale-105"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
                     }`}
@@ -226,21 +228,6 @@ const Sidebar = () => {
                   Learning Center
                 </h3>
                 <div className="space-y-1">
-                  {/* Get Started */}
-                  <Link
-                    ref={setNavRef("/get-started")}
-                    href="/get-started"
-                    className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
-                      pathname === "/get-started"
-                        ? "text-white bg-gradient-to-r from-green-500/50 via-teal-500/50 to-emerald-500/50 py-2 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/50 scale-105"
-                        : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
-                    }`}
-                    onClick={closeMobileMenu}
-                  >
-                    <AiOutlineQuestionCircle className="mr-3 text-lg" />
-                    Get Started
-                  </Link>
-
                   {/* Blogs */}
                   <Link
                     ref={setNavRef("/blogs")}
