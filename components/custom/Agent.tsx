@@ -91,23 +91,6 @@ const Agent = ({
   const SPEECH_TIMEOUT_MS = 3500;
   const [voiceId, setVoiceId] = useState<voiceId>("Rohan");
   const [open, setOpen] = useState(false);
-  const [callTimer, setCallTimer] = useState(0);
-
-  //Function to start the call timer:
-  useEffect(() => {
-    let timer: NodeJS.Timeout | null = null;
-
-    if (callStatus === CallStatus.ACTIVE) {
-      timer = setInterval(() => {
-        setCallTimer((prev) => prev + 1);
-      }, 1000);
-    } else {
-      setCallTimer(0);
-      if (timer) clearInterval(timer);
-    }
-
-    if (timer) clearInterval(timer);
-  }, [callStatus]);
 
   //useEffect Hook executed in the initial mounting:
   useEffect(() => {
@@ -514,7 +497,7 @@ const Agent = ({
     //If the feedback is generated successfully push into the feedback page:
     if (success && feedbackId) {
       toast.success("Successfully generated the feedback!");
-      router.push(`/interview/${interviewId}/feedback`);
+      router.push(`/interview/${interviewId}/feedback/${feedbackId}`);
     } else {
       toast.error(message || "Error generating feedback");
       router.push("/home");
@@ -961,17 +944,6 @@ const Agent = ({
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-            {/* Call Timer */}
-            {callStatus === CallStatus.ACTIVE && (
-              <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full bg-gradient-to-tr from-emerald-500/80 to-green-400/80 flex items-center justify-center shadow-lg">
-                <span className="text-white font-mono font-bold">
-                  {Math.floor(callTimer / 60)
-                    .toString()
-                    .padStart(2, "0")}
-                  :{(callTimer % 60).toString().padStart(2, "0")}
-                </span>
-              </div>
-            )}
             {/* Call / End controls */}
             {callStatus === CallStatus.CONNECTING ? (
               <button
