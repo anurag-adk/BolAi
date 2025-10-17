@@ -5,6 +5,8 @@
 //Imports For JWT And Crypto:
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import { createHash } from "crypto";
+import { headers } from "next/headers";
 
 //Imports For Db:
 import { db } from "@/firebase/admin";
@@ -14,6 +16,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/client";
 import { auth as adminAuth } from "@/firebase/admin";
 import { decryptPassword } from "./encryptDecrypt";
+import { rateLimiter } from "./rateLimiting";
 
 //Interface For The Payloads
 interface TokenPayload {
@@ -138,6 +141,21 @@ export async function regenerateToken(payload: TokenPayload) {
 //Function To Check And Verify The Jwt Token And Provided Otp Value:
 export async function checkAndVerify(payload: verifyPayload) {
   try {
+    // Rate limiting check with progressive windows
+    const tokenKey = `ratelimit:otp:${payload.token}`;
+
+    const rateLimitResult = await rateLimiter(tokenKey);
+
+    if (!rateLimitResult.allowed) {
+      const timeLeftMinutes = Math.ceil((rateLimitResult.timeLeft || 0) / 60);
+      const tier = rateLimitResult.tierLevel;
+
+      return {
+        success: false,
+        type: "stay",
+        message: `Too many verification attempts. You're in ${tier} tier. Please try again in ${timeLeftMinutes} minutes.`,
+      };
+    }
     //Check Whether The Provided Token Is Valid:
     const decodedData = await verifyToken(payload.token);
     if (
@@ -184,9 +202,12 @@ export async function checkAndVerify(payload: verifyPayload) {
       };
     }
 
-    //Check the otp values:
-    const otp = parseInt(payload.otpCode, 10); //Provided Otp
-    if (otp !== userInfo.otp!) {
+    //Check the otp values using hash comparison
+    const inputOtpHash = createHash("sha256")
+      .update(payload.otpCode)
+      .digest("hex");
+
+    if (inputOtpHash !== userInfo.otpHash) {
       //Before Decrementing Check The Rate-Limiting Logic:
       if (userInfo.rate === 1) {
         //This is the last and you have exhausted all of the attempts to verify your account:

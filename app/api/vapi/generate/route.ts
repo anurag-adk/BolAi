@@ -22,10 +22,29 @@ interface Interview {
   techstack: string | string[]; //Array Of The Strings
 }
 
+import { rateLimiter } from "@/lib/rateLimiting";
+
 export async function POST(request: Request) {
   const requestData: Interview = await request.json();
   const { type, role, level, techstack, amount, userid, imagePath } =
     requestData;
+
+  // Rate limiting with progressive windows
+  const rateKey = `ratelimit:generate:${userid}`;
+  const rateLimitResult = await rateLimiter(rateKey);
+
+  if (!rateLimitResult.allowed) {
+    const timeLeftMinutes = Math.ceil((rateLimitResult.timeLeft || 0) / 60);
+    const tier = rateLimitResult.tierLevel;
+
+    return Response.json(
+      {
+        success: false,
+        message: `Too many requests. You're in ${tier} tier. Please try again in ${timeLeftMinutes} minutes.`,
+      },
+      { status: 429 }
+    );
+  }
   try {
     const { text: questions } = await generateText({
       model: groq("llama-3.3-70b-versatile"),
@@ -78,7 +97,7 @@ export async function POST(request: Request) {
       finalized: true,
       imagePath: imagePath
         ? imagePath
-        : "https://placehold.co/150x150/28a745/ffffff?text=BolAi&font=roboto&size=28",
+        : "https://placehold.co/150x150/ffffff/28a745?text=BolAi",
       createdAt: new Date().toISOString(),
     };
 

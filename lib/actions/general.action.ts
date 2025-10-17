@@ -108,30 +108,81 @@ export async function fetchLatestGeneratedInterviews(params: {
   }
 }
 //This will help to fetch the specific interview details:
-export const fetchInterviewsById = async (interviewId: string) => {
+export const fetchInterviewsById = async (
+  interviewId: string,
+  userId: string, // Making userId required for security
+  includeQuestions: boolean = false
+) => {
   try {
-    //1. Check whether the interview id provided is valid:
-    if (
-      !interviewId ||
-      !interviewId.trim() ||
-      interviewId === null ||
-      interviewId === undefined
-    ) {
-      console.error(
-        "The provided interview id is invalid. Interview Id:",
-        interviewId
-      );
+    // 1. Validate input parameters
+    if (!interviewId?.trim() || !userId?.trim()) {
+      console.error("Invalid interview ID or user ID", { interviewId, userId });
+      return {
+        success: false,
+        message: "Invalid request parameters",
+      };
     }
-    //2. Fetch the specific data from the database:
+
+    // 2. Fetch interview with owner check
     const interview = await db.collection("interviews").doc(interviewId).get();
-    //3. Check the fetched value:
-    if (!interview) {
-      return null;
+
+    if (!interview.exists) {
+      return {
+        success: false,
+        message: "Interview not found",
+      };
     }
-    //4.Return the value with ID:
+
+    const interviewData = interview.data();
+    if (!interviewData) {
+      return {
+        success: false,
+        message: "Interview data not found",
+      };
+    }
+
+    // 3. Strict authorization check
+    if (interviewData.userId !== userId) {
+      // Only allow access to public interviews
+      if (!interviewData.finalized) {
+        console.error(
+          `Unauthorized access attempt: User ${userId} tried to access interview ${interviewId} owned by ${interviewData.userId}`
+        );
+        return {
+          success: false,
+          message: "Unauthorized access",
+        };
+      }
+
+      // For public interviews, limit visible data
+      const publicData = {
+        id: interview.id,
+        role: interviewData.role,
+        type: interviewData.type,
+        level: interviewData.level,
+        techstack: interviewData.techstack,
+        finalized: interviewData.finalized,
+        createdAt: interviewData.createdAt,
+      };
+
+      return {
+        success: true,
+        data: publicData,
+      };
+    }
+
+    // 4. Handle sensitive data (questions) for interview owner
+    if (!includeQuestions) {
+      delete interviewData.questions;
+    }
+
+    // 5. Return full data for owner
     return {
-      id: interview.id,
-      ...interview.data(),
+      success: true,
+      data: {
+        id: interview.id,
+        ...interviewData,
+      },
     };
   } catch (error: any) {
     console.error("Error fetching the interviews: ", error.message || error);
@@ -296,6 +347,62 @@ export async function fetchFeedbackById(params: {
     };
   }
 }
+
+//SECURITY FIX: New function to fetch interview questions only when user starts the interview
+export const fetchInterviewQuestions = async (
+  interviewId: string,
+  userId: string
+) => {
+  try {
+    // Validate inputs
+    if (!interviewId || !userId) {
+      console.error("Invalid interviewId or userId provided");
+      return {
+        success: false,
+        message: "Invalid request parameters",
+      };
+    }
+
+    // Fetch the interview
+    const interview = await db.collection("interviews").doc(interviewId).get();
+
+    if (!interview.exists) {
+      return {
+        success: false,
+        message: "Interview not found",
+      };
+    }
+
+    const interviewData: any = interview.data();
+
+    // AUTHORIZATION CHECK: User must own this interview
+    if (interviewData.userId !== userId) {
+      console.error(
+        `Unauthorized: User ${userId} tried to access questions for interview ${interviewId} owned by ${interviewData.userId}`
+      );
+      return {
+        success: false,
+        message:
+          "Unauthorized: You can only access your own interview questions",
+      };
+    }
+
+    // Return only the questions
+    return {
+      success: true,
+      questions: interviewData.questions || [],
+    };
+  } catch (error: any) {
+    console.error(
+      "Error fetching interview questions:",
+      error.message || error
+    );
+    return {
+      success: false,
+      message: "Error fetching interview questions",
+    };
+  }
+};
 
 //This will help to fetch all the necessary feedbacks for the user, so if user wants to access his feedbacks can easily do it.
 export async function fetchFeedbacksForUser(userId: string) {

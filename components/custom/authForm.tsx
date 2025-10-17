@@ -17,8 +17,8 @@ import { auth } from "@/firebase/client";
 import { signIn, signup } from "@/lib/actions/auth.action";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 
-//For Otp And JWT:
-import { generateOtp, generateToken } from "@/lib/otpTokenUtils";
+//For JWT:
+import { generateToken } from "@/lib/otpTokenUtils";
 
 //ShadCn Components:
 import { Button } from "@/components/ui/button";
@@ -64,14 +64,11 @@ const AuthForm = ({ type }: any) => {
         setIsLoading(true);
         //Get The Values From The Form
         const { name, email, password } = values;
-        //Creating The Otp Value:
-        const otp = await generateOtp();
-        //Using the signup method:
+        //Using the signup method (OTP is now generated securely on server-side):
         const result = await signup({
           name: name!,
           email: email,
           password: password,
-          otp: otp,
         });
         //If The Signup Failed
         if (!result?.success) {
@@ -79,7 +76,7 @@ const AuthForm = ({ type }: any) => {
           setIsLoading(false);
           return;
         }
-        //Now Creating A Jwt Token With name, email and otp
+        //Now Creating A Jwt Token With name and email
         const token = await generateToken({ name, email });
         //Response:
         setIsLoading(false);

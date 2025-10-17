@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { getCurrentUser } from "@/lib/actions/auth.action";
 import {
   fetchFeedbackById,

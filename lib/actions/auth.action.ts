@@ -8,12 +8,13 @@ import { sendMail } from "../nodemailer";
 import redis from "../redisConfig";
 import { encryptPassword } from "../encryptDecrypt";
 import cloudinary from "../cloudinary";
+import { generateOtp } from "@/lib/otpTokenUtils";
+import { createHash } from "crypto";
 
 interface signUpParams {
   name: string;
   email: string;
   password: string;
-  otp: number;
 }
 
 interface signInParams {
@@ -37,7 +38,7 @@ export type User = {
 };
 
 export const signup = async (params: signUpParams) => {
-  const { name, email, password, otp } = params;
+  const { name, email, password } = params;
   try {
     //Check If The User Already Exists In The Platform
     const userDBRecord = await db
@@ -60,6 +61,12 @@ export const signup = async (params: signUpParams) => {
           "You have already created an account but have left to validate it.",
       };
     }
+    //Generate OTP on server side using crypto-secure method
+    const otp = await generateOtp(); // Using the secure generateOtp function
+
+    //Hash the OTP before storing
+    const otpHash = createHash("sha256").update(otp.toString()).digest("hex");
+
     //Encrypt The Password And Store It In Redis:
     const encryptedPassword = encryptPassword(password);
     //Store it in the redis db which expires in 5m:
@@ -69,7 +76,7 @@ export const signup = async (params: signUpParams) => {
         name,
         email,
         password: encryptedPassword,
-        otp,
+        otpHash,
         rate: 5,
       }),
       { ex: 300 }
@@ -148,11 +155,15 @@ export const setSessionCookie = async (idToken: string) => {
     const sessionCookie = await auth.createSessionCookie(idToken, {
       expiresIn: 1000 * 60 * 60 * 24 * 3, // 3-Day Duration in ms for firebase
     });
+
+    // SECURITY FIX: Use secure cookies in production
+    const isProduction = process.env.NODE_ENV === "production";
+
     cookieStore.set("session", sessionCookie, {
-      httpOnly: true, //Http-Only Cookie
-      sameSite: "lax",
+      httpOnly: true, //Http-Only Cookie - prevents XSS
+      sameSite: "lax", //CSRF protection
       path: "/",
-      secure: false, //Development
+      secure: isProduction, //SECURITY: Force HTTPS in production
       maxAge: 60 * 60 * 24 * 3, // 3-Day Duration in secs
     });
   } catch (error) {
@@ -163,11 +174,13 @@ export const setSessionCookie = async (idToken: string) => {
 export const clearSessionCookie = async () => {
   try {
     const cookieStore = await cookies();
+    const isProduction = process.env.NODE_ENV === "production";
+
     cookieStore.set("session", "", {
       httpOnly: true,
       sameSite: "lax",
       path: "/",
-      secure: false,
+      secure: isProduction, //SECURITY: Match the secure flag from setSessionCookie
       maxAge: 0,
     });
   } catch (e) {
@@ -210,6 +223,26 @@ export const isAuthenticated = async () => {
 //This function will help the users to update their profile info:
 export const updateUserProfile = async (params: updateParams) => {
   try {
+    //SECURITY FIX: Verify the requesting user is authenticated and authorized
+    const currentUser = await getCurrentUser();
+    if (!currentUser) {
+      return {
+        success: false,
+        message: "You must be logged in to update your profile.",
+      };
+    }
+
+    //SECURITY FIX: Verify the user can only update their own profile
+    if (currentUser.id !== params.id) {
+      console.error(
+        `Unauthorized profile update attempt: User ${currentUser.id} tried to update profile ${params.id}`
+      );
+      return {
+        success: false,
+        message: "Unauthorized: You can only update your own profile.",
+      };
+    }
+
     //Check Whether The User Exists:
     const userExists = await auth.getUser(params.id);
     if (!userExists) {

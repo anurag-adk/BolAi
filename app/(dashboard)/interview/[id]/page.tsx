@@ -1,5 +1,7 @@
+
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { fetchInterviewsById } from "@/lib/actions/general.action";
+import { fetchInterviewsById, fetchInterviewQuestions } from "@/lib/actions/general.action";
 import { redirect } from "next/navigation";
 import TechIcon from "@/components/custom/techIcon";
 import Agent from "../../../../components/custom/Agent";
@@ -9,13 +11,33 @@ import { PiBrainDuotone } from "react-icons/pi";
 import { RiChatVoiceAiFill } from "react-icons/ri";
 import { FaQuestion } from "react-icons/fa";
 
+
+
+
+
+
+
+
 const InterviewPage = async ({ params }: { params: { id: string } }) => {
   const { id } = await params;
-  const interview = await fetchInterviewsById(id);
+  //Retrieve the user information first:
+  const user = await getCurrentUser();
+  
+  //SECURITY FIX: Check if user is authenticated
+  if (!user) {
+    redirect("/login");
+  }
+  
+  //SECURITY FIX: Fetch interview with authorization check (without questions)
+  const interview = await fetchInterviewsById(id, user.id, false);
   //Check if there is data or not:
   if (!interview) redirect("/");
-  //Retrieve the user information:
-  const user = await getCurrentUser();
+  
+  //SECURITY FIX: Fetch questions separately with authorization
+  const questionsResponse = await fetchInterviewQuestions(id, user.id);
+  if (!questionsResponse.success) {
+    redirect("/");
+  }
   return (
     <>
       <div className="w-full min-h-screen flex flex-col justify-start items-center relative">
@@ -106,14 +128,22 @@ const InterviewPage = async ({ params }: { params: { id: string } }) => {
             ))}
           </div>
         </div>
-        {/* Agent Component For Mock Interview */}
+
+
+
+
+
+
+
+
+                {/* Agent Component For Mock Interview */}
         <Agent
           userName={user?.name || ""}
           type="interview"
           userId={user?.id || ""}
           profilePic={user?.profilePic || ""}
           interviewId={interview.id}
-          questions={interview.questions}
+          questions={questionsResponse.questions}
         />
       </div>
     </>
