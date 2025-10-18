@@ -5,6 +5,7 @@ import { getCurrentUser } from "@/lib/actions/auth.action";
 import { fetchFeedbacksForUser } from "@/lib/actions/general.action";
 import Link from "next/link";
 import React from "react";
+import { FaChartLine } from "react-icons/fa";
 
 const feedbackPage = async () => {
   //Get Current User:
@@ -80,28 +81,55 @@ const feedbackPage = async () => {
             />
           ))
         ) : (
-          <div className="col-span-full w-full max-w-2xl mx-auto mt-8 p-8 rounded-2xl bg-gradient-to-br from-slate-800/80 to-slate-900/70 border border-white/10 shadow-xl text-center">
-            <div className="text-6xl mb-4">📊</div>
-            <h3 className="text-2xl md:text-3xl font-semibold text-white mb-4">
-              No Feedback Yet
-            </h3>
-            <p className="text-slate-300/80 text-lg mb-6 max-w-md mx-auto">
-              Start an interview to access your feedback and scores. Track your
-              progress and improve your skills!
-            </p>
-            <Button
-              asChild
-              className="w-[60%] md:w-[40%] lg:w-[30%] h-[8vh] md:h-[6vh] lg:h-[7vh] rounded-lg hover:cursor-pointer transition-all ease-in-out duration-150 hover:-translate-y-[1px] bg-emerald-600 hover:bg-emerald-500/80 ring-1 ring-white/10 shadow-lg shadow-emerald-900/40"
-            >
-              <Link
-                href="/interview"
-                className="flex justify-center items-center"
-              >
-                <div className="text-lg md:text-xl lg:text-base text-white font-medium">
-                  Start Interview
+          <div className="col-span-full w-full max-w-2xl mx-auto mt-8">
+            <div className="group relative px-8 py-12 rounded-xl bg-gradient-to-br from-gray-800/80 to-gray-900/90 border border-gray-700/40 backdrop-blur-md transition-all duration-500 hover:shadow-green-500/20 hover:shadow-2xl">
+              {/* Border Glow on Hover */}
+              <div className="absolute inset-0 rounded-xl border border-green-500/0 group-hover:border-green-500/20 transition-all duration-500 pointer-events-none"></div>
+
+              {/* Icon with glow */}
+              <div className="relative mb-6 flex justify-center z-10">
+                <div className="relative">
+                  {/* Outer glow */}
+                  <div className="absolute inset-0 w-20 h-20 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 opacity-20 blur-xl animate-pulse"></div>
+
+                  {/* Icon circle */}
+                  <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-green-500 via-green-600 to-emerald-700 flex justify-center items-center shadow-xl border border-green-400/30 group-hover:border-green-300/50 transition-all duration-300">
+                    <FaChartLine className="text-3xl text-white drop-shadow-lg" />
+
+                    {/* Inner highlight */}
+                    <div className="absolute inset-2 rounded-full bg-gradient-to-br from-white/20 to-transparent"></div>
+                  </div>
                 </div>
-              </Link>
-            </Button>
+              </div>
+
+              {/* Title */}
+              <h3 className="relative z-10 text-2xl md:text-3xl font-bold text-white mb-4 text-center group-hover:text-green-300 transition-all duration-300">
+                No Feedback Yet
+              </h3>
+
+              {/* Description */}
+              <p className="relative z-10 text-gray-300 text-lg mb-8 max-w-md mx-auto text-center leading-relaxed group-hover:text-gray-100 transition-all duration-300">
+                Start an interview to access your feedback and scores. Track
+                your progress and improve your skills!
+              </p>
+
+              {/* Button */}
+              <div className="relative z-10 flex justify-center">
+                <Button
+                  asChild
+                  className="w-[60%] md:w-[40%] lg:w-[35%] h-[8vh] md:h-[6vh] lg:h-[7vh] rounded-md hover:cursor-pointer transition-all ease-in-out duration-150 hover:scale-105 bg-green-700 hover:bg-green-400/70"
+                >
+                  <Link
+                    href="/interview"
+                    className="flex justify-center items-center"
+                  >
+                    <div className="text-lg md:text-xl lg:text-base text-white font-medium">
+                      Start Interview
+                    </div>
+                  </Link>
+                </Button>
+              </div>
+            </div>
           </div>
         )}
       </div>
