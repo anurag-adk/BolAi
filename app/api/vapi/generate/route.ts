@@ -3,7 +3,7 @@ import { groq } from "@ai-sdk/groq";
 import { db } from "@/firebase/admin";
 
 export async function GET() {
-  console.log("GROQ_API_KEY:", process.env.GROQ_API_KEY);
+  // API key logging removed for security
   return Response.json({
     success: true,
     message: "THANK YOU!",

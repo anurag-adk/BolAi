@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 //Lint Fixes:
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -53,8 +54,7 @@ export async function fetchGeneratedInterviews(params: {
     //Return The Array:
     return interviewData;
   } catch (error: any) {
-    console.error("Error fetching interviews:", error.message || error);
-    console.error("userId provided:", userId);
+    console.error("Error fetching interviews");
     return null;
   }
 }
@@ -101,22 +101,31 @@ export async function fetchLatestGeneratedInterviews(params: {
     //Return the array:
     return interviewData;
   } catch (error: any) {
-    console.error("Error Fetching Interviews:", error.message || error);
-    console.error("userId provided:", params?.userId);
-    console.error("limit provided:", params?.limit);
+    console.error("Error fetching interviews");
     return null;
   }
 }
 //This will help to fetch the specific interview details:
+import { InterviewResponse } from "@/types/api";
+import { InterviewData, QuestionData } from "@/types/interview";
+
+interface FirebaseInterviewData
+  extends Omit<InterviewData, "id" | "questions"> {
+  userId: string;
+  finalized?: boolean;
+  createdAt: string;
+  questions?: QuestionData[];
+}
+
 export const fetchInterviewsById = async (
   interviewId: string,
   userId: string, // Making userId required for security
   includeQuestions: boolean = false
-) => {
+): Promise<InterviewResponse> => {
   try {
     // 1. Validate input parameters
     if (!interviewId?.trim() || !userId?.trim()) {
-      console.error("Invalid interview ID or user ID", { interviewId, userId });
+      console.error("Invalid request parameters");
       return {
         success: false,
         message: "Invalid request parameters",
@@ -133,7 +142,7 @@ export const fetchInterviewsById = async (
       };
     }
 
-    const interviewData = interview.data();
+    const interviewData = interview.data() as FirebaseInterviewData | undefined;
     if (!interviewData) {
       return {
         success: false,
@@ -141,48 +150,29 @@ export const fetchInterviewsById = async (
       };
     }
 
-    // 3. Strict authorization check
-    if (interviewData.userId !== userId) {
-      // Only allow access to public interviews
-      if (!interviewData.finalized) {
-        console.error(
-          `Unauthorized access attempt: User ${userId} tried to access interview ${interviewId} owned by ${interviewData.userId}`
-        );
-        return {
-          success: false,
-          message: "Unauthorized access",
-        };
-      }
-
-      // For public interviews, limit visible data
-      const publicData = {
-        id: interview.id,
-        role: interviewData.role,
-        type: interviewData.type,
-        level: interviewData.level,
-        techstack: interviewData.techstack,
-        finalized: interviewData.finalized,
-        createdAt: interviewData.createdAt,
-      };
-
+    // 3. Authorization check
+    if (interviewData.userId !== userId && !interviewData.finalized) {
+      console.error("Unauthorized access attempt");
       return {
-        success: true,
-        data: publicData,
+        success: false,
+        message: "Unauthorized access",
       };
     }
 
-    // 4. Handle sensitive data (questions) for interview owner
-    if (!includeQuestions) {
-      delete interviewData.questions;
-    }
+    // 4. Transform data to match InterviewData type
+    const transformedData: InterviewData = {
+      id: interview.id,
+      role: interviewData.role,
+      type: interviewData.type,
+      imagePath: interviewData.imagePath,
+      techstack: interviewData.techstack,
+      questions: includeQuestions ? interviewData.questions || [] : [],
+    };
 
-    // 5. Return full data for owner
+    // 5. Return full data
     return {
       success: true,
-      data: {
-        id: interview.id,
-        ...interviewData,
-      },
+      data: transformedData,
     };
   } catch (error: any) {
     console.error("Error fetching the interviews: ", error.message || error);
@@ -190,83 +180,218 @@ export const fetchInterviewsById = async (
       "The provided interview Id is invalid. InterviewId:",
       interviewId
     );
-    return null;
+    return {
+      success: false,
+      message: "Error fetching interview data",
+    };
   }
 };
 //This will create a feedback for the interview done:
 export const createFeedback = async (params: CreateFeedbackParams) => {
   try {
     const { interviewId, userId, transcript } = params;
+
+    // Validate transcript
+    if (!transcript || transcript.length === 0) {
+      console.error("Empty transcript provided");
+      return {
+        success: false,
+        message: "Cannot generate feedback from empty transcript",
+      };
+    }
+
+    // Enhanced transcript formatting with clear role separation
     const formattedTranscript = transcript
-      .map(
-        (sentence: { role: string; content: string }) =>
-          `- ${sentence.role}: ${sentence.content} \n`
-      )
-      .join("");
-    const { text: feedbackText } = await generateText({
-      model: groq("llama-3.3-70b-versatile"),
-      prompt: `You are an AI interviewer analyzing a mock interview. Your task is to evaluate the candidate based on structured categories. Be thorough and detailed in your analysis. Don't be lenient with the candidate. If there are mistakes or areas for improvement, point them out.
+      .map((sentence: { role: string; content: string }, index) => {
+        const rolePrefix =
+          sentence.role === "assistant" ? "Interviewer" : "Candidate";
+        return `${rolePrefix} [Turn ${index + 1}]: ${sentence.content}\n`;
+      })
+      .join("\n");
 
-      Return the feedback as a valid JSON object matching this exact structure:
+    // Add retry logic for AI generation
+    let attemptCount = 0;
+    const maxAttempts = 3;
+    let feedbackText = "";
 
-      {
-        "totalScore": number,
-        "categoryScores": [
-          { "name": "Understanding & Relevance", "score": number, "comment": string },
-          { "name": "Depth of Knowledge & Accuracy", "score": number, "comment": string },
-          { "name": "Problem-Solving & Reasoning Ability", "score": number, "comment": string },
-          { "name": "Communication & Articulation", "score": number, "comment": string },
-          { "name": "Professionalism & Attitude", "score": number, "comment": string }
-        ],
-        "strengths": [string],
-        "areasForImprovement": [string],
-        "finalAssessment": string
-      }
+    while (attemptCount < maxAttempts) {
+      try {
+        const { text } = await generateText({
+          model: groq("llama-3.3-70b-versatile"),
+          prompt: `You are an expert AI interviewer conducting a comprehensive analysis of a mock interview. Your task is to provide detailed, constructive feedback based on the candidate's performance. Be objective and thorough in your evaluation.
+
+      Analyze the following interview transcript and provide a detailed evaluation in JSON format.
       
-      Transcript:
+      === Interview Context ===
       ${formattedTranscript}
 
-      Please score the candidate from 0 to 100 in the following areas. Do not add categories other than the ones provided:
-        - **Understanding & Relevance**: How well the candidate comprehends the question and provides a relevant answer.
-        - **Depth of Knowledge & Accuracy**: The correctness, precision, and completeness of the information or logic provided.
-        - **Problem-Solving & Reasoning Ability**: How effectively the candidate applies logical thinking or creativity to find and justify solutions.
-        - **Communication & Articulation**: How clearly, confidently, and fluently the candidate communicates.
-        - **Professionalism & Attitude**: How the candidate conducts themselves politeness, tone, patience, and enthusiasm.
+      === Evaluation Guidelines ===
+      1. Score each category from 0-100 based on specific criteria
+      2. Provide detailed comments with examples from the transcript
+      3. List concrete strengths and areas for improvement
+      4. Give actionable recommendations in the final assessment
 
+      Return a valid JSON object with this exact structure:
+      {
+        "totalScore": number (0-100),
+        "categoryScores": [
+          {
+            "name": "Understanding & Relevance",
+            "score": number (0-100),
+            "comment": "Detailed analysis with specific examples from the interview"
+          },
+          {
+            "name": "Depth of Knowledge & Accuracy",
+            "score": number (0-100),
+            "comment": "Evaluate technical accuracy and depth of responses"
+          },
+          {
+            "name": "Problem-Solving & Reasoning Ability",
+            "score": number (0-100),
+            "comment": "Assess logical thinking and solution approach"
+          },
+          {
+            "name": "Communication & Articulation",
+            "score": number (0-100),
+            "comment": "Evaluate clarity and effectiveness of communication"
+          },
+          {
+            "name": "Professionalism & Attitude",
+            "score": number (0-100),
+            "comment": "Assess professional conduct and demeanor"
+          }
+        ],
+        "strengths": ["Clear, specific strengths with examples"],
+        "areasForImprovement": ["Actionable improvement points"],
+        "finalAssessment": "Comprehensive evaluation summary with specific recommendations"
+      }
+
+      Scoring Criteria:
+      - Understanding & Relevance (0-100): Comprehension of questions and relevance of answers
+      - Depth of Knowledge & Accuracy (0-100): Technical accuracy and completeness
+      - Problem-Solving & Reasoning (0-100): Logical thinking and solution quality
+      - Communication & Articulation (0-100): Clarity and fluency
+      - Professionalism & Attitude (0-100): Professional conduct and engagement
+
+      Ensure all scores and feedback are justified with specific examples from the transcript.
       `,
-    });
-    // Clean and parse JSON safely
+        });
+        feedbackText = text;
+        break; // Success! Exit the retry loop
+      } catch (error) {
+        attemptCount++;
+        console.error("Feedback generation attempt failed");
+        if (attemptCount === maxAttempts) {
+          return {
+            success: false,
+            message: "Failed to generate feedback after multiple attempts",
+          };
+        }
+        // Wait before retrying (exponential backoff)
+        await new Promise((resolve) =>
+          setTimeout(resolve, Math.pow(2, attemptCount) * 1000)
+        );
+      }
+    }
+    // Clean and parse JSON safely with enhanced error handling
     let data: Feedback | null = null;
     try {
+      // Clean the response text
       const cleaned = feedbackText
         .trim()
         .replace(/```json/g, "")
-        .replace(/```/g, "");
-      data = feedbackSchema.parse(JSON.parse(cleaned));
+        .replace(/```/g, "")
+        .replace(/^\s*{\s*/, "{") // Clean leading whitespace
+        .replace(/\s*}\s*$/, "}"); // Clean trailing whitespace
+
+      // Parse and validate the JSON structure
+      const parsedData = JSON.parse(cleaned);
+
+      // Validate all required fields are present
+      const requiredFields = [
+        "totalScore",
+        "categoryScores",
+        "strengths",
+        "areasForImprovement",
+        "finalAssessment",
+      ];
+      const missingFields = requiredFields.filter(
+        (field) => !(field in parsedData)
+      );
+
+      if (missingFields.length > 0) {
+        console.error("Missing required fields in feedback:", missingFields);
+        return {
+          success: false,
+          message:
+            "Incomplete feedback generated. Missing required information.",
+        };
+      }
+
+      // Validate score ranges
+      if (parsedData.totalScore < 0 || parsedData.totalScore > 100) {
+        console.error("Invalid total score:", parsedData.totalScore);
+        return {
+          success: false,
+          message: "Invalid feedback score range.",
+        };
+      }
+
+      // Validate using Zod schema
+      data = feedbackSchema.parse(parsedData);
+
+      // Additional validation for meaningful content
+      if (
+        data.strengths.length === 0 ||
+        data.areasForImprovement.length === 0
+      ) {
+        console.error("Empty strengths or areas for improvement");
+        return {
+          success: false,
+          message: "Incomplete feedback analysis.",
+        };
+      }
     } catch (error) {
       console.error("Failed to parse AI feedback:", error);
       return {
         success: false,
-        message:
-          "There was error generating the feedback for the user's interview.",
+        message: "Error processing the interview feedback.",
       };
     }
-    //Adding the data or object into db:
-    const feedback = await db.collection("feedback").add({
-      interviewId,
-      userId,
-      totalScore: data.totalScore,
-      categoryScores: data.categoryScores,
-      strengths: data.strengths,
-      areasForImprovement: data.areasForImprovement,
-      finalAssessment: data.finalAssessment,
-      createdAt: new Date().toISOString(),
-    });
 
-    return {
-      success: true,
-      feedbackId: feedback.id,
-    };
+    try {
+      // Store feedback in database with additional metadata
+      const feedback = await db.collection("feedback").add({
+        interviewId,
+        userId,
+        totalScore: data.totalScore,
+        categoryScores: data.categoryScores,
+        strengths: data.strengths,
+        areasForImprovement: data.areasForImprovement,
+        finalAssessment: data.finalAssessment,
+        createdAt: new Date().toISOString(),
+        metadata: {
+          transcriptLength: transcript.length,
+          generatedAt: new Date().toISOString(),
+          version: "2.0", // For tracking feedback format versions
+        },
+      });
+
+      const result = {
+        success: true,
+        message: "Feedback generated and stored successfully",
+        feedbackId: feedback.id,
+        data: feedback,
+      };
+
+      return result;
+    } catch (error) {
+      console.error("Failed to store feedback in database:", error);
+      return {
+        success: false,
+        message: "Error saving the feedback to database.",
+      };
+    }
   } catch (error: any) {
     console.error(
       "Error saving the feedback for the interview: ",
@@ -373,18 +498,31 @@ export const fetchInterviewQuestions = async (
       };
     }
 
-    const interviewData: any = interview.data();
+    const interviewData = interview.data() as FirebaseInterviewData | undefined;
 
-    // AUTHORIZATION CHECK: User must own this interview
-    if (interviewData.userId !== userId) {
-      console.error(
-        `Unauthorized: User ${userId} tried to access questions for interview ${interviewId} owned by ${interviewData.userId}`
-      );
+    if (!interviewData) {
       return {
         success: false,
-        message:
-          "Unauthorized: You can only access your own interview questions",
+        message: "Interview data not found",
       };
+    }
+
+    // AUTHORIZATION CHECK: Allow access to finalized (community) interviews
+    if (interviewData.userId !== userId) {
+      if (!interviewData.finalized) {
+        console.error(
+          `Unauthorized: User ${userId} tried to access questions for private interview ${interviewId} owned by ${interviewData.userId}`
+        );
+        return {
+          success: false,
+          message:
+            "Unauthorized: This interview is not available in the community",
+        };
+      }
+
+      console.log(
+        `Community interview access: User ${userId} accessing interview ${interviewId}`
+      );
     }
 
     // Return only the questions

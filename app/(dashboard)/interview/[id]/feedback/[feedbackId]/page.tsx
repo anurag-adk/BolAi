@@ -20,27 +20,36 @@ const feedbackPage = async ({
 }: {
   params: { id: string; feedbackId: string };
 }) => {
-  const { id, feedbackId } = await params;
-  console.log(id, feedbackId);
+  const { id, feedbackId } = params;
   const user = await getCurrentUser();
 
+  // Authentication check
+  if (!user) {
+    redirect("/login");
+  }
+
   //Check if the provided link has valid interview:
-  const interview = await fetchInterviewsById(id);
-  if (!interview) {
-    redirect("/");
+  const interview = await fetchInterviewsById(id, user.id, false);
+  if (!interview || !interview.success) {
+    redirect("/home");
   }
 
   //Fetch The Feedback Info:
   const feedbackInfo = await fetchFeedbackById({
     interviewId: id,
-    userId: user?.id || "",
+    userId: user.id, // User is guaranteed to exist here
     feedbackId,
   });
+
+  // Improved error handling
   if (!feedbackInfo || "success" in feedbackInfo) {
-    redirect("/");
+    redirect("/myFeedbacks");
   }
 
-  console.log(feedbackInfo);
+  // Type guard to ensure feedbackInfo has required properties
+  if (!feedbackInfo.totalScore || !feedbackInfo.categoryScores) {
+    redirect("/myFeedbacks");
+  }
 
   //Determining the trail and path color of the progress bar:
   const getProgressColors = (score: number) => {

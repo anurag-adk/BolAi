@@ -5,7 +5,7 @@
 //CSR:
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { MdCallEnd, MdCall } from "react-icons/md";
 import { ImSpinner8 } from "react-icons/im";
 import { FiMessageCircle } from "react-icons/fi";
@@ -34,39 +34,12 @@ import { voices } from "@/constants/voices";
 import AudioPlayer from "./audioPlayer";
 import { createFeedback } from "@/lib/actions/general.action";
 
-interface AiInterviewProps {
-  userName: string;
-  type: string;
-  userId: string;
-  profilePic: string;
-  interviewId?: string;
-  questions?: any[];
-}
-
-enum CallStatus {
-  INACTIVE = "INACTIVE",
-  CONNECTING = "CONNECTING",
-  ACTIVE = "ACTIVE",
-  FINISHED = "FINISHED",
-}
-
-interface SavedMessage {
-  role: "user" | "system" | "assistant";
-  content: string;
-}
-
-type voiceId =
-  | "Rohan"
-  | "Neha"
-  | "Spencer"
-  | "Elliot"
-  | "Kylie"
-  | "Lily"
-  | "Savannah"
-  | "Hana"
-  | "Cole"
-  | "Harry"
-  | "Paige";
+import {
+  AiInterviewProps,
+  CallStatus,
+  SavedMessage,
+  VoiceId,
+} from "@/types/agent";
 
 const Agent = ({
   userName,
@@ -89,7 +62,7 @@ const Agent = ({
 
   // Constants
   const SPEECH_TIMEOUT_MS = 3500;
-  const [voiceId, setVoiceId] = useState<voiceId>("Rohan");
+  const [voiceId, setVoiceId] = useState<VoiceId>("Rohan");
   const [open, setOpen] = useState(false);
 
   //useEffect Hook executed in the initial mounting:
@@ -102,8 +75,8 @@ const Agent = ({
     const onCallEnd = () => {
       console.log("🔴 Vapi call ended - checking why call ended");
       console.log("Call end timestamp:", new Date().toISOString());
-      console.log("Messages collected so far:", messages);
-      console.log("Current speaking role:", speakingRole);
+      // Removing message content logging for security
+      console.log("Call ended");
       setCallStatus(CallStatus.FINISHED);
       // Clear any pending speech timeout
       if (speechTimeoutId) {
@@ -113,7 +86,7 @@ const Agent = ({
     };
 
     const onMessage = (message: any) => {
-      console.log("📨 Vapi message received:", message);
+      console.log("📨 Vapi message received");
       console.log("Message timestamp:", new Date().toISOString());
       console.log("Message type:", message.type);
       console.log("Message role:", message.role);
@@ -121,7 +94,7 @@ const Agent = ({
 
       // Check for model-output to see what assistant is trying to say
       if (message.type === "model-output") {
-        console.log("🤖 Assistant model output:", message.output);
+        console.log("🤖 Assistant model response received");
 
         // Handle both string and array outputs
         const output = Array.isArray(message.output)
@@ -179,7 +152,7 @@ const Agent = ({
             "🔍 Debug info - Is array:",
             Array.isArray(message.output)
           );
-          console.log("🔍 Debug info - Raw content:", message.output);
+          console.log("🔍 Debug info - Output received");
         }
 
         // Check for direct API call indicators
@@ -485,38 +458,64 @@ const Agent = ({
   }, [userId, userName]);
 
   //Function to generate the feedback of the interview session:
-  const handleGenerateFeedback = async (messages: SavedMessage[]) => {
-    console.log("Generate feedback here.");
+  const handleGenerateFeedback = useCallback(
+    async (messages: SavedMessage[]) => {
+      try {
+        console.log("Generating feedback...");
+        if (!interviewId || !userId || messages.length === 0) {
+          toast.error("Missing required data for feedback generation");
+          await router.push("/home");
+          return;
+        }
 
-    const { success, feedbackId, message } = await createFeedback({
-      interviewId: interviewId!,
-      userId: userId,
-      transcript: messages,
-    });
+        interface FeedbackResponse {
+          success: boolean;
+          data?: {
+            id: string;
+          };
+          message?: string;
+        }
 
-    //If the feedback is generated successfully push into the feedback page:
-    if (success && feedbackId) {
-      toast.success("Successfully generated the feedback!");
-      router.push(`/interview/${interviewId}/feedback/${feedbackId}`);
-    } else {
-      toast.error(message || "Error generating feedback");
-      router.push("/home");
-    }
-  };
+        const result = (await createFeedback({
+          interviewId,
+          userId,
+          transcript: messages,
+        })) as FeedbackResponse;
 
-  //useEffect Hook when anything changes:
+        if (result.success && result.data?.id) {
+          toast.success("Successfully generated the feedback!");
+          await router.push(
+            `/interview/${interviewId}/feedback/${result.data.id}`
+          );
+        } else {
+          toast.error(result.message || "Error generating feedback");
+          await router.push("/home");
+        }
+      } catch (error: unknown) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error occurred";
+        console.error("Error generating feedback:", errorMessage);
+        toast.error("Failed to generate feedback");
+        await router.push("/home");
+      }
+    },
+    [interviewId, userId, router]
+  );
+
+  //useEffect Hook when call status changes:
   useEffect(() => {
-    if (callStatus === CallStatus.FINISHED) {
-      //After finishing the interview if the type is generate than go to home.
-      if (type === "generate") {
-        router.push("/home");
+    const handleCallFinished = async () => {
+      if (callStatus === CallStatus.FINISHED) {
+        if (type === "generate") {
+          await router.push("/home");
+        } else if (messages.length > 0) {
+          await handleGenerateFeedback(messages);
+        }
       }
-      //After finishing the interview if the type is interview than generate the feedbacks.
-      else {
-        handleGenerateFeedback(messages);
-      }
-    }
-  }, [messages, callStatus, type, userId, router, handleGenerateFeedback]);
+    };
+
+    handleCallFinished();
+  }, [callStatus, type, messages, handleGenerateFeedback, router]);
 
   const handleCall = async () => {
     // Prevent multiple simultaneous calls
@@ -591,11 +590,12 @@ const Agent = ({
         );
         toast.success("Vapi call initiated successfully");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Call start error:", error);
       setCallStatus(CallStatus.INACTIVE);
 
-      const errorMessage = error?.message || "Unknown error occurred";
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
       alert(`Failed to start call: ${errorMessage}`);
       toast.error(`Failed to start call: ${errorMessage}`);
     }
@@ -873,7 +873,7 @@ const Agent = ({
                             : "bg-transparent hover:bg-gray-800/80"
                         }`}
                         onClick={() => {
-                          setVoiceId(voice.name as voiceId);
+                          setVoiceId(voice.name as VoiceId);
                           setOpen(false);
                         }}
                       >

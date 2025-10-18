@@ -93,8 +93,7 @@ export async function regenerateToken(payload: TokenPayload) {
         userData = userExists;
       }
     } catch (parseError) {
-      console.error("Redis data parsing error:", parseError);
-      console.error("Raw Redis data:", userExists);
+      console.error("Redis data parsing error occurred");
       return {
         success: false,
         type: "resend",
@@ -193,8 +192,7 @@ export async function checkAndVerify(payload: verifyPayload) {
         userInfo = userExists;
       }
     } catch (parseError) {
-      console.error("Redis data parsing error:", parseError);
-      console.error("Raw Redis data:", userExists);
+      console.error("Redis data parsing error occurred");
       return {
         success: false,
         type: "resend",

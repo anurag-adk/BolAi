@@ -1,7 +1,4 @@
-
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { fetchInterviewsById, fetchInterviewQuestions } from "@/lib/actions/general.action";
+import { fetchInterviewsById } from "@/lib/actions/general.action";
 import { redirect } from "next/navigation";
 import TechIcon from "@/components/custom/techIcon";
 import Agent from "../../../../components/custom/Agent";
@@ -11,33 +8,25 @@ import { PiBrainDuotone } from "react-icons/pi";
 import { RiChatVoiceAiFill } from "react-icons/ri";
 import { FaQuestion } from "react-icons/fa";
 
-
-
-
-
-
-
-
 const InterviewPage = async ({ params }: { params: { id: string } }) => {
   const { id } = await params;
   //Retrieve the user information first:
   const user = await getCurrentUser();
-  
+
   //SECURITY FIX: Check if user is authenticated
   if (!user) {
     redirect("/login");
   }
-  
-  //SECURITY FIX: Fetch interview with authorization check (without questions)
-  const interview = await fetchInterviewsById(id, user.id, false);
-  //Check if there is data or not:
-  if (!interview) redirect("/");
-  
-  //SECURITY FIX: Fetch questions separately with authorization
-  const questionsResponse = await fetchInterviewQuestions(id, user.id);
-  if (!questionsResponse.success) {
+
+  //SECURITY FIX: Get full interview data including questions
+  const fullInterview = await fetchInterviewsById(id, user.id, true);
+
+  if (!fullInterview?.success || !fullInterview.data) {
+    console.error("Failed to fetch full interview data");
     redirect("/");
   }
+
+  const interview = fullInterview.data;
   return (
     <>
       <div className="w-full min-h-screen flex flex-col justify-start items-center relative">
@@ -69,7 +58,7 @@ const InterviewPage = async ({ params }: { params: { id: string } }) => {
             <div
               className="w-[60%] h-[72%] md:w-[58%] md:h-[66%] lg:w-[66%] lg:h-[70%] bg-transparent aspect-square"
               style={{
-                backgroundImage: `url(${interview.imagePath})`,
+                backgroundImage: `url(${interview.imagePath || ""})`,
                 backgroundPosition: "center",
                 backgroundSize: "cover",
                 backgroundRepeat: "no-repeat",
@@ -110,14 +99,14 @@ const InterviewPage = async ({ params }: { params: { id: string } }) => {
               <div className="flex justify-start items-center">
                 <FaQuestion className="mr-2 text-amber-400" />
                 <div className="text-sm md:text-base lg:text-sm text-gray-400">
-                  {interview.questions.length} AI Questions
+                  {interview.questions?.length || 0} AI Questions
                 </div>
               </div>
             </div>
           </div>
           {/* TechStack Icon */}
           <div className="flex flex-row justify-start items-center gap-x-2">
-            {interview.techstack.map((techIcon: any) => (
+            {interview.techstack.map((techIcon: string) => (
               <TechIcon
                 techStack={techIcon
                   .toLowerCase()
@@ -129,21 +118,14 @@ const InterviewPage = async ({ params }: { params: { id: string } }) => {
           </div>
         </div>
 
-
-
-
-
-
-
-
-                {/* Agent Component For Mock Interview */}
+        {/* Agent Component For Mock Interview */}
         <Agent
           userName={user?.name || ""}
           type="interview"
           userId={user?.id || ""}
           profilePic={user?.profilePic || ""}
           interviewId={interview.id}
-          questions={questionsResponse.questions}
+          questions={(interview.questions || []).map((q) => q.question)}
         />
       </div>
     </>

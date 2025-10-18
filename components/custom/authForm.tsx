@@ -84,7 +84,6 @@ const AuthForm = ({ type }: any) => {
           "Successfully registered! Verify your email to login into the system. An OTP has been sent to your provided email."
         );
         router.push(`/verify/${token}`);
-        console.log("Signed Up!", values);
       } else {
         setIsLoading(true);
         //Values coming from zod
@@ -113,7 +112,6 @@ const AuthForm = ({ type }: any) => {
         setIsLoading(false);
         toast.success("Successfully LoggedIn!");
         router.push("/home");
-        console.log("Signed In!", values);
       }
     } catch (error: any) {
       console.error(error);

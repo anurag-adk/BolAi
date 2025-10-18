@@ -123,9 +123,8 @@ export const sendMail = async (payload: mailPayload) => {
     console.log("📧 Email type:", payload.type);
 
     if (payload.type === "otp") {
-      console.log("� YOUR OTP CODE:", payload.otp);
-      console.log("⏰ This OTP expires in 5 minutes");
-      console.log("💡 Use this OTP in your verification form");
+      console.log("⏰ OTP has been generated and will expire in 5 minutes");
+      console.log("💡 Please check your email for the verification code");
     } else if (payload.type === "verified") {
       console.log("🎉 Welcome email would be sent to:", payload.name || "User");
       console.log("✅ Account verification completed successfully");

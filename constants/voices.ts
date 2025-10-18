@@ -1,4 +1,6 @@
-export const voices = [
+import { Voice } from "@/types/agent";
+
+export const voices: Voice[] = [
   {
     name: "Rohan",
     gender: "Male",
