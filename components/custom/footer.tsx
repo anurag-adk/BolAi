@@ -13,7 +13,7 @@ const Footer = () => {
               <div
                 className="w-16 h-16 mr-5"
                 style={{
-                  backgroundImage: `url('/motif.png')`,
+                  backgroundImage: `url('/motif.svg')`,
                   backgroundPosition: "center",
                   backgroundRepeat: "no-repeat",
                   backgroundSize: "cover",
@@ -144,7 +144,7 @@ const Footer = () => {
               <div
                 className="w-36 h-12"
                 style={{
-                  backgroundImage: `url('/wordmark-white.png')`,
+                  backgroundImage: `url('/wordmark-white.svg')`,
                   backgroundPosition: "center",
                   backgroundRepeat: "no-repeat",
                   backgroundSize: "contain",

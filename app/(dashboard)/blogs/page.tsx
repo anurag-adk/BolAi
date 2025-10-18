@@ -39,7 +39,7 @@ const BlogPage = () => {
           <div
             className="max-sm:hidden md:max-md:hidden md:h-[24vh] lg:w-[19.5%] lg:h-[30vh] bg-transparent"
             style={{
-              backgroundImage: `url(/blogPage.png)`,
+              backgroundImage: `url(/blogPage.svg)`,
               backgroundPosition: "center",
               backgroundSize: "cover",
               backgroundRepeat: "no-repeat",

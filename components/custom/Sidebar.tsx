@@ -125,7 +125,7 @@ const Sidebar = () => {
               <div
                 className="w-10 h-10"
                 style={{
-                  backgroundImage: `url('/motif.png')`,
+                  backgroundImage: `url('/motif.svg')`,
                   backgroundSize: "cover",
                   backgroundRepeat: "no-repeat",
                   backgroundPosition: "center",
@@ -375,7 +375,7 @@ const Sidebar = () => {
             <div
               className="w-8 h-8"
               style={{
-                backgroundImage: `url('/motif.png')`,
+                backgroundImage: `url('/motif.svg')`,
                 backgroundSize: "cover",
                 backgroundRepeat: "no-repeat",
                 backgroundPosition: "center",
