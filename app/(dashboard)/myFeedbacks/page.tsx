@@ -17,7 +17,7 @@ const feedbackPage = async () => {
     <div className="w-full min-h-screen flex flex-col justify-start items-center overflow-y-auto mt-4 px-5">
       {/* Banner And CTA */}
       <BackgroundLines className="w-[95%] md:w-[98%] lg:w-[90%] h-[45vh] md:h-[38vh] lg:h-[40vh] mt-4">
-        <div className="w-full h-full bg-transparent rounded-md flex flex-col justify-around items-start md:flex-row md:justify-around md:items-center lg:flex-row lg:justify-around lg:items-center mb-4">
+        <div className="w-full h-full bg-transparent rounded-md flex flex-col justify-start items-start md:flex-row md:justify-between md:items-center lg:flex-row lg:justify-between lg:items-center mb-4">
           {/* Banner Actions */}
           <div className="w-full lg:w-[55%] md:w-[58%] flex flex-col justify-center items-start lg:items-start md:items-start p-6 mt-2">
             {/* Title */}
@@ -48,11 +48,11 @@ const feedbackPage = async () => {
 
           {/* Banner Image */}
           <div
-            className="max-sm:hidden  md:w-[42%] md:h-[26vh] lg:w-[36%] lg:h-[38vh]"
+            className="max-sm:hidden md:w-[40%] md:h-[32vh] lg:w-[34%] lg:h-[34vh]"
             style={{
-              backgroundImage: `url(/myFeedbacks.png)`,
-              backgroundPosition: "center",
-              backgroundSize: "cover",
+              backgroundImage: `url(/myFeedbacks.svg)`,
+              backgroundPosition: "center center",
+              backgroundSize: "contain",
               backgroundRepeat: "no-repeat",
             }}
           ></div>

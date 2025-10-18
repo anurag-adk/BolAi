@@ -16,6 +16,7 @@ import {
   AiOutlineThunderbolt,
   AiOutlineMenu,
   AiOutlineClose,
+  AiOutlineHome,
 } from "react-icons/ai";
 
 // ShadCn Component
@@ -125,7 +126,7 @@ const Sidebar = () => {
               <div
                 className="w-10 h-10"
                 style={{
-                  backgroundImage: `url('/motif.png')`,
+                  backgroundImage: `url('/motif.svg')`,
                   backgroundSize: "cover",
                   backgroundRepeat: "no-repeat",
                   backgroundPosition: "center",
@@ -160,13 +161,28 @@ const Sidebar = () => {
                   Interview Prep
                 </h3>
                 <div className="space-y-1">
+                  {/* Home or Dashboard Tab */}
+                  <Link
+                    ref={setNavRef("/home")}
+                    href="/home"
+                    className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
+                      pathname === "/home"
+                        ? "text-white bg-gray-700 px-3 py-2 hover:scale-102"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
+                    }`}
+                    onClick={closeMobileMenu}
+                  >
+                    <AiOutlineHome className="mr-3 text-lg" />
+                    Dashboard
+                  </Link>
+
                   {/* My Feedbacks Tab */}
                   <Link
                     ref={setNavRef("/myFeedbacks")}
                     href="/myFeedbacks"
                     className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
                       pathname === "/myFeedbacks"
-                        ? "text-white bg-gradient-to-r from-green-500/50 via-teal-500/50 to-emerald-500/50 py-2 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/50 scale-105"
+                        ? "text-white bg-gray-700 px-3 py-2 hover:scale-102"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
                     }`}
                     onClick={closeMobileMenu}
@@ -181,7 +197,7 @@ const Sidebar = () => {
                     href="/interview"
                     className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
                       pathname === "/interview"
-                        ? "text-white bg-gradient-to-r from-green-500/50 via-teal-500/50 to-emerald-500/50 py-2 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/50 scale-105"
+                        ? "text-white bg-gray-700 px-3 py-2 hover:scale-102"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
                     }`}
                     onClick={closeMobileMenu}
@@ -196,7 +212,7 @@ const Sidebar = () => {
                     href="/myInterviews"
                     className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
                       pathname === "/myInterviews"
-                        ? "text-white bg-gradient-to-r from-green-500/50 via-teal-500/50 to-emerald-500/50 py-2 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/50 scale-105"
+                        ? "text-white bg-gray-700 px-3 py-2 hover:scale-102"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
                     }`}
                     onClick={closeMobileMenu}
@@ -211,7 +227,7 @@ const Sidebar = () => {
                     href="/interviewHub"
                     className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
                       pathname === "/interviewHub"
-                        ? "text-white bg-gradient-to-r from-green-500/50 via-teal-500/50 to-emerald-500/50 py-2 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/50 scale-105"
+                        ? "text-white bg-gray-700 px-3 py-2 hover:scale-102"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
                     }`}
                     onClick={closeMobileMenu}
@@ -234,13 +250,27 @@ const Sidebar = () => {
                     href="/blogs"
                     className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
                       pathname === "/blogs"
-                        ? "text-white bg-gradient-to-r from-green-500/50 via-teal-500/50 to-emerald-500/50 py-2 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/50 scale-105"
+                        ? "text-white bg-gray-700 px-3 py-2 hover:scale-102"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
                     }`}
                     onClick={closeMobileMenu}
                   >
                     <AiOutlineBook className="mr-3 text-lg" />
                     Blogs
+                  </Link>
+                  {/* FAQ */}
+                  <Link
+                    ref={setNavRef("/faq")}
+                    href="/faq"
+                    className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
+                      pathname === "/faq"
+                        ? "text-white bg-gray-700 px-3 py-2 hover:scale-102"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
+                    }`}
+                    onClick={closeMobileMenu}
+                  >
+                    <AiOutlineQuestionCircle className="mr-3 text-lg" />
+                    FAQ
                   </Link>
                 </div>
               </div>
@@ -257,7 +287,7 @@ const Sidebar = () => {
                     href="/profile"
                     className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
                       pathname === "/profile"
-                        ? "text-white bg-gradient-to-r from-green-500/50 via-teal-500/50 to-emerald-500/50 py-2 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/50 scale-105"
+                        ? "text-white bg-gray-700 px-3 py-2 hover:scale-102"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
                     }`}
                     onClick={closeMobileMenu}
@@ -272,7 +302,7 @@ const Sidebar = () => {
                     href="/subscription"
                     className={`flex items-center rounded-md transition-all duration-300 ease-in-out ${
                       pathname === "/subscription"
-                        ? "text-white bg-gradient-to-r from-green-500/50 via-teal-500/50 to-emerald-500/50 py-2 px-3 mb-2 hover:from-green-600/80 hover:via-teal-600/80 hover:to-emerald-600/80 shadow-sm shadow-teal-400/50 scale-105"
+                        ? "text-white bg-gray-700 px-3 py-2 hover:scale-102"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 hover:scale-102"
                     }`}
                     onClick={closeMobileMenu}
@@ -308,7 +338,7 @@ const Sidebar = () => {
 
         {/* User Profile Section */}
         <AlertDialog>
-          {/* The content being rendered using anurag's previous div */}
+          {/* The content being rendered using previous div */}
           <AlertDialogTrigger className="hover:cursor-pointer transition-all ease-in-out duration-150 hover:bg-gray-700/40">
             <div className="p-4 border-t border-gray-700 flex-shrink-0 flex justify-start items-center">
               <div className="flex justify-start items-center space-x-3">
@@ -375,7 +405,7 @@ const Sidebar = () => {
             <div
               className="w-8 h-8"
               style={{
-                backgroundImage: `url('/motif.png')`,
+                backgroundImage: `url('/motif.svg')`,
                 backgroundSize: "cover",
                 backgroundRepeat: "no-repeat",
                 backgroundPosition: "center",

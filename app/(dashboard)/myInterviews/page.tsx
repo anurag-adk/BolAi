@@ -21,9 +21,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { PiSortDescendingBold } from "react-icons/pi";
+import { FiFilter } from "react-icons/fi";
+import { AiOutlineClose } from "react-icons/ai";
 import { ImSpinner8 } from "react-icons/im";
-import { MdCancel } from "react-icons/md";
 import useFilterInterview from "@/hooks/filterInterview";
 import { BackgroundLines } from "@/components/ui/background-lines";
 
@@ -97,7 +97,7 @@ const MyInterviewsPage = () => {
     <div className="w-full min-h-screen flex flex-col justify-start items-center overflow-y-auto mt-4 px-5">
       {/* Banner Component */}
       <BackgroundLines className="w-[95%] md:w-[98%] lg:w-[90%] h-[45vh] md:h-[38vh] lg:h-[40vh] mt-4 mb-4">
-        <div className="w-full h-full bg-transparent rounded-md flex flex-col justify-start items-start md:flex-row md:justify-start md:items-center lg:flex-row lg:justify-around lg:items-center mb-4">
+        <div className="w-full h-full bg-transparent rounded-md flex flex-col justify-start items-start md:flex-row md:justify-between md:items-center lg:flex-row lg:justify-between lg:items-center mb-4">
           <div className="w-full lg:w-[55%] md:w-[58%] flex flex-col justify-center items-start lg:items-start md:items-start p-6 mt-2 bg-transparent">
             <div className="text-2xl md:text-3xl lg:text-3xl text-white font-semibold mb-4">
               Build Your Interview Portfolio with Every Practice
@@ -120,11 +120,11 @@ const MyInterviewsPage = () => {
             </Button>
           </div>
           <div
-            className="max-sm:hidden md:w-[42%] md:h-[14vh] lg:w-[34%] lg:h-[34vh] bg-transparent"
+            className="max-sm:hidden md:w-[40%] md:h-[32vh] lg:w-[34%] lg:h-[34vh] bg-transparent"
             style={{
-              backgroundImage: `url(/myInterviews.png)`,
-              backgroundPosition: "center",
-              backgroundSize: "cover",
+              backgroundImage: `url(/myInterviews.svg)`,
+              backgroundPosition: "center center",
+              backgroundSize: "contain",
               backgroundRepeat: "no-repeat",
             }}
           ></div>
@@ -132,177 +132,198 @@ const MyInterviewsPage = () => {
       </BackgroundLines>
       {/* Main Cards Render */}
       <div className="w-[95.5%] md:w-[95%] lg:w-[90%] flex flex-col justify-start items-start mt-8 mb-4">
-        {/* Filter Button */}
-        <div className="w-[95%] md:w-[98%] lg:w-[87.5%] flex justify-end items-center mb-6">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <div className="w-[56%] h-[7.95vh] md:w-[52%] md:h-[7.35vh] lg:w-[18%] lg:h-[7.25vh] bg-green-600/80 hover:cursor-pointer hover:bg-green-500/80 flex justify-center items-center rounded-md transition-all ease-in-out duration-150 hover:scale-105">
-                <div className="text-white font-semibold text-md md:text-2xl lg:text-sm mr-2">
-                  Refine Results
-                </div>
-                <PiSortDescendingBold className="text-white text-xl" />
-              </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="start">
-              <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-              <DropdownMenuGroup>
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>Level</DropdownMenuSubTrigger>
-                  <DropdownMenuPortal>
-                    <DropdownMenuSubContent>
-                      <DropdownMenuItem
-                        onClick={() => setSelectedLevel("Entry")}
-                      >
-                        Entry
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setSelectedLevel("Mid")}>
-                        Mid
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => setSelectedLevel("Senior")}
-                      >
-                        Senior
-                      </DropdownMenuItem>
-                    </DropdownMenuSubContent>
-                  </DropdownMenuPortal>
-                </DropdownMenuSub>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>Type</DropdownMenuSubTrigger>
-                  <DropdownMenuPortal>
-                    <DropdownMenuSubContent>
-                      <DropdownMenuItem
-                        onClick={() => setSelectedType("Technical")}
-                      >
-                        Technical
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => setSelectedType("Behavioral")}
-                      >
-                        Behavioral
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => setSelectedType("Mixed")}
-                      >
-                        Mixed
-                      </DropdownMenuItem>
-                    </DropdownMenuSubContent>
-                  </DropdownMenuPortal>
-                </DropdownMenuSub>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>Position</DropdownMenuSubTrigger>
-                  <DropdownMenuPortal>
-                    <DropdownMenuSubContent>
-                      <DropdownMenuItem
-                        onClick={() => setSelectedRole("Frontend")}
-                      >
-                        Front End
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => setSelectedRole("Backend")}
-                      >
-                        Back End
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => setSelectedRole("Devops")}
-                      >
-                        DevOps
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => setSelectedRole("Fullstack")}
-                      >
-                        Full Stack
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => setSelectedRole("Mobile Developer")}
-                      >
-                        Mobile Developement
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => setSelectedRole("Others")}
-                      >
-                        Others
-                      </DropdownMenuItem>
-                    </DropdownMenuSubContent>
-                  </DropdownMenuPortal>
-                </DropdownMenuSub>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
+        {/* Filter Section Header */}
+        <div className="w-full flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+          {/* Results Counter */}
+          <div className="flex items-center gap-4">
+            <h2 className="text-xl md:text-2xl lg:text-xl text-white font-semibold">
+              My Interviews
+            </h2>
+            <div className="px-3 py-1 bg-gray-700/50 rounded-full text-sm text-gray-300">
+              {filteredInterviews.length} of {myInterviews.length}
+            </div>
+          </div>
+
+          {/* Filter Controls */}
+          <div className="flex items-center gap-3">
+            {/* Clear All Filters Button */}
+            {(selectedLevel || selectedRole || selectedType) && (
+              <button
                 onClick={() => {
                   setSelectedLevel("");
                   setSelectedRole("");
                   setSelectedType("");
                 }}
+                className="px-4 py-2 text-sm text-gray-300 hover:text-white border border-gray-600 hover:border-gray-500 rounded-lg transition-colors duration-200"
               >
-                Reset
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                Clear All
+              </button>
+            )}
+
+            {/* Filter Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 px-4 py-2 bg-transparent hover:bg-gray-700/50 text-gray-300 hover:text-white border border-gray-600 hover:border-gray-500 rounded-lg transition-all duration-200">
+                  <FiFilter className="text-lg" />
+                  <span className="font-medium">Filter By</span>
+                  {(selectedLevel || selectedRole || selectedType) && (
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                  )}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="start">
+                <DropdownMenuLabel>Filter by</DropdownMenuLabel>
+                <DropdownMenuGroup>
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>Level</DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                      <DropdownMenuSubContent>
+                        <DropdownMenuItem
+                          onClick={() => setSelectedLevel("Entry")}
+                        >
+                          Entry
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => setSelectedLevel("Mid")}
+                        >
+                          Mid
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => setSelectedLevel("Senior")}
+                        >
+                          Senior
+                        </DropdownMenuItem>
+                      </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>Type</DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                      <DropdownMenuSubContent>
+                        <DropdownMenuItem
+                          onClick={() => setSelectedType("Technical")}
+                        >
+                          Technical
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => setSelectedType("Behavioral")}
+                        >
+                          Behavioral
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => setSelectedType("Mixed")}
+                        >
+                          Mixed
+                        </DropdownMenuItem>
+                      </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>Position</DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                      <DropdownMenuSubContent>
+                        <DropdownMenuItem
+                          onClick={() => setSelectedRole("Frontend")}
+                        >
+                          Front End
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => setSelectedRole("Backend")}
+                        >
+                          Back End
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => setSelectedRole("Devops")}
+                        >
+                          DevOps
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => setSelectedRole("Fullstack")}
+                        >
+                          Full Stack
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => setSelectedRole("Mobile Developer")}
+                        >
+                          Mobile Developement
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => setSelectedRole("Others")}
+                        >
+                          Others
+                        </DropdownMenuItem>
+                      </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSelectedLevel("");
+                    setSelectedRole("");
+                    setSelectedType("");
+                  }}
+                >
+                  Reset
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-        {/* Showing the total interviews fetched */}
-        {filteredInterviews.length > 0 && (
-          <div className="w-full p-2 flex justify-start items-center mb-2">
-            <div className="text-center text-md md:text-xl lg:text-sm text-white font-semibold">
-              Showing {filteredInterviews.length} of {myInterviews.length}{" "}
-              interviews.
-            </div>
-          </div>
-        )}
-        {/* Showing the active filters used */}
+
+        {/* Active Filters Display */}
         {(selectedLevel || selectedRole || selectedType) && (
-          <div className="w-full p-2 flex flex-col justify-start items-start lg:flex-row lg:justify-start lg:items-center mb-4">
-            <div className="text-md md:text-xl lg:text-md lg:text-sm text-white font-semibold mr-0 mb-3 lg:mr-4 lg:mb-0">
-              Active Filters:
-            </div>
-            <div className="w-full lg:w-[85%] ml-2 flex-row flex-wrap justify-start items-center gap-4">
+          <div className="w-full mb-6">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm text-gray-400 font-medium">
+                Active filters:
+              </span>
+
               {selectedLevel && (
-                <div className="p-2 h-[5.25vh] rounded-sm bg-green-600/80 flex justify-around items-center hover:bg-green-400/80">
-                  <div className="text-md md:text-xl lg:text-sm font-semibold text-white mr-2">
-                    {selectedLevel}
-                  </div>
-                  <div
-                    className="hover:cursor-pointer"
+                <div className="flex items-center gap-1 px-3 py-1 bg-blue-500/20 border border-blue-500/40 rounded-full text-sm text-blue-300">
+                  <span>Level: {selectedLevel}</span>
+                  <button
                     onClick={() => setSelectedLevel("")}
+                    className="ml-1 hover:bg-blue-500/30 rounded-full p-0.5 transition-colors"
                   >
-                    <MdCancel className="text-2xl md:text-3xl lg:text-xl text-white font-semibold" />
-                  </div>
+                    <AiOutlineClose className="w-3 h-3" />
+                  </button>
                 </div>
               )}
+
               {selectedType && (
-                <div className="p-2 h-[5.25vh] rounded-sm bg-green-600/80 flex justify-around items-center hover:bg-green-400/80">
-                  <div className="text-md md:text-lg lg:text-sm font-semibold text-white mr-2">
-                    {selectedType}
-                  </div>
-                  <div
-                    className="hover:cursor-pointer"
+                <div className="flex items-center gap-1 px-3 py-1 bg-purple-500/20 border border-purple-500/40 rounded-full text-sm text-purple-300">
+                  <span>Type: {selectedType}</span>
+                  <button
                     onClick={() => setSelectedType("")}
+                    className="ml-1 hover:bg-purple-500/30 rounded-full p-0.5 transition-colors"
                   >
-                    <MdCancel className="text-2xl md:text-3xl lg:text-xl text-white font-semibold" />
-                  </div>
+                    <AiOutlineClose className="w-3 h-3" />
+                  </button>
                 </div>
               )}
+
               {selectedRole && (
-                <div className="p-2 h-[5.25vh] rounded-sm bg-green-600/80 flex justify-around items-center hover:bg-green-400/80">
-                  <div className="text-md md:text-lg lg:text-sm font-semibold text-white mr-2">
-                    {selectedRole}
-                  </div>
-                  <div
-                    className="hover:cursor-pointer"
+                <div className="flex items-center gap-1 px-3 py-1 bg-green-500/20 border border-green-500/40 rounded-full text-sm text-green-300">
+                  <span>Position: {selectedRole}</span>
+                  <button
                     onClick={() => setSelectedRole("")}
+                    className="ml-1 hover:bg-green-500/30 rounded-full p-0.5 transition-colors"
                   >
-                    <MdCancel className="text-2xl md:text-3xl lg:text-xl text-white font-semibold" />
-                  </div>
+                    <AiOutlineClose className="w-3 h-3" />
+                  </button>
                 </div>
               )}
             </div>
           </div>
         )}
+
         {/* Rendering Cards */}
         <div className="w-full grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-4 justify-items-start">
           {filteredInterviews.length > 0 ? (

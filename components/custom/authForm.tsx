@@ -139,7 +139,7 @@ const AuthForm = ({ type }: any) => {
             <div
               className="w-12 h-12 bg-transparent rounded-lg"
               style={{
-                backgroundImage: `url('/motif.png')`,
+                backgroundImage: `url('/motif.svg')`,
                 backgroundPosition: "center",
                 backgroundSize: "cover",
                 backgroundRepeat: "no-repeat",
