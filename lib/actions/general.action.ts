@@ -10,6 +10,7 @@ import { db } from "@/firebase/admin";
 import { generateText } from "ai";
 import { groq } from "@ai-sdk/groq";
 import { Feedback, feedbackSchema, FeedbackWithId } from "@/constants/index";
+import { logger } from "@/lib/logger";
 
 //Types:
 type CreateFeedbackParams = {
@@ -28,7 +29,7 @@ export async function fetchGeneratedInterviews(params: {
   try {
     // Validate userId parameter
     if (!userId || userId === undefined || userId === null) {
-      console.error("fetchGeneratedInterviews: userId is undefined or null");
+      logger.error("fetchGeneratedInterviews: invalid user ID");
       return null;
     }
     //Fetching the interviews from the datbase

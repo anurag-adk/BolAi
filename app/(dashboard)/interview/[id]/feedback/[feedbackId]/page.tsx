@@ -20,8 +20,9 @@ const feedbackPage = async ({
 }: {
   params: { id: string; feedbackId: string };
 }) => {
-  const { id, feedbackId } = params;
   const user = await getCurrentUser();
+  const id = params.id;
+  const feedbackId = params.feedbackId;
 
   // Authentication check
   if (!user) {
