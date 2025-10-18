@@ -5,7 +5,7 @@ import Link from "next/link";
 import React from "react";
 import InterviewCard from "@/components/custom/interviewCard";
 import { getCurrentUser } from "@/lib/actions/auth.action";
-import { FaArrowRight } from "react-icons/fa";
+import { FaChevronDown } from "react-icons/fa";
 import { BackgroundLines } from "@/components/ui/background-lines";
 import {
   fetchGeneratedInterviews,
@@ -46,7 +46,7 @@ const HomePage = async () => {
     <div className="w-full min-h-screen flex flex-col justify-start items-center overflow-y-auto mt-4 px-5">
       {/* Banner And CTA */}
       <BackgroundLines className="w-[95%] md:w-[98%] lg:w-[90%] h-[45vh] md:h-[38vh] lg:h-[40vh] mt-4">
-        <div className="w-full h-full bg-transparent rounded-md flex flex-col justify-around items-start md:flex-row md:justify-around md:items-center lg:flex-row lg:justify-around lg:items-center mb-4">
+        <div className="w-full h-full bg-transparent rounded-md flex flex-col justify-start items-start md:flex-row md:justify-between md:items-center lg:flex-row lg:justify-between lg:items-center mb-4">
           {/* Banner Actions */}
           <div className="w-full lg:w-[55%] md:w-[58%] flex flex-col justify-center items-start lg:items-start md:items-start p-6 mt-2">
             {/* Title */}
@@ -77,11 +77,11 @@ const HomePage = async () => {
 
           {/* Banner Image */}
           <div
-            className="max-sm:hidden md:w-[40%] md:h-[32vh] lg:w-[20%] lg:h-[30vh]"
+            className="max-sm:hidden md:w-[40%] md:h-[32vh] lg:w-[34%] lg:h-[34vh]"
             style={{
               backgroundImage: `url(/homePage.svg)`,
-              backgroundPosition: "center",
-              backgroundSize: "cover",
+              backgroundPosition: "center center",
+              backgroundSize: "contain",
               backgroundRepeat: "no-repeat",
             }}
           ></div>
@@ -90,23 +90,17 @@ const HomePage = async () => {
 
       {/* Displaying the users Interviews */}
       <div className="w-[95%] md:w-[95%] lg:w-[90%] flex flex-col justify-start items-start mt-8 mb-4">
-        <div className="w-full p-2 flex justify-start items-center mb-4 md:mb-6 lg:mb-4">
+        <div className="w-full p-2 flex justify-between md:justify-between lg:justify-start items-center mb-4 md:mb-6 lg:mb-4 gap-x-4">
           {/* Title */}
-          <div className="text-2xl md:text-3xl lg:text-2xl font-semibold text-white mr-8">
+          <div className="text-2xl md:text-3xl lg:text-2xl font-semibold text-white">
             My Interviews
           </div>
-          {/* View More CTA Button */}
-          <Button className="bg-green-600/80 h-[6.5vh] w-[38%] md:w-[38%] lg:w-[12.5%] rounded-md hover:cursor-pointer hover:bg-green-500/80 transition-all ease-in-out duration-150 hover:scale-105">
-            <Link
-              href="/myInterviews"
-              className="flex justify-center items-center"
-            >
-              <div className="font-semibold text-white mr-2 text-md md:text-xl lg:text-sm">
-                View More
-              </div>
-              <FaArrowRight className="font-semibold text-white" />
-            </Link>
-          </Button>
+          {/* View More CTA Button - Circular Icon */}
+          <Link href="/myInterviews">
+            <button className="group w-10 h-10 md:w-12 md:h-12 lg:w-10 lg:h-10 rounded-full border-2 border-gray-600 hover:border-gray-400 flex items-center justify-center transition-all duration-200 hover:bg-gray-700/30">
+              <FaChevronDown className="text-gray-400 group-hover:text-white text-sm md:text-base lg:text-sm transition-colors duration-200" />
+            </button>
+          </Link>
         </div>
         {/* Render The Interview Cards */}
         <div className="w-full grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-4 justify-items-start">
@@ -124,23 +118,17 @@ const HomePage = async () => {
       </div>
       {/* Displaying the available Interviews */}
       <div className="w-[95%] md:w-[95%] lg:w-[90%] flex flex-col justify-start items-start mt-8 mb-4">
-        <div className="w-full p-2 flex justify-start items-center mb-4 md:mb-6 lg:mb-4">
+        <div className="w-full p-2 flex justify-between md:justify-between lg:justify-start items-center mb-4 md:mb-6 lg:mb-4 gap-x-4">
           {/* Title */}
-          <div className="text-2xl md:text-3xl lg:text-2xl font-semibold text-white mr-8">
+          <div className="text-2xl md:text-3xl lg:text-2xl font-semibold text-white">
             Interview Hub
           </div>
-          {/* View More CTA Button */}
-          <Button className="bg-green-600/80 h-[6.5vh] w-[38%] md:w-[38%] lg:w-[12.5%] rounded-md hover:cursor-pointer hover:bg-green-500/80 transition-all ease-in-out duration-150 hover:scale-105">
-            <Link
-              href="/interviewHub"
-              className="flex justify-center items-center"
-            >
-              <div className="font-semibold text-white mr-2 text-md md:text-xl lg:text-sm">
-                View More
-              </div>
-              <FaArrowRight className="font-semibold text-white" />
-            </Link>
-          </Button>
+          {/* View More CTA Button - Circular Icon */}
+          <Link href="/interviewHub">
+            <button className="group w-10 h-10 md:w-12 md:h-12 lg:w-10 lg:h-10 rounded-full border-2 border-gray-600 hover:border-gray-400 flex items-center justify-center transition-all duration-200 hover:bg-gray-700/30">
+              <FaChevronDown className="text-gray-400 group-hover:text-white text-sm md:text-base lg:text-sm transition-colors duration-200" />
+            </button>
+          </Link>
         </div>
         {/* Render The Interview Cards */}
         <div className="w-full grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-4 justify-items-start">
