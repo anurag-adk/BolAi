@@ -270,7 +270,11 @@ const InterviewHubPage = () => {
         <div className="w-full grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-4">
           {filteredInterviews.length > 0 ? (
             filteredInterviews.map((interview: any) => (
-              <InterviewCard key={interview.id} {...interview} />
+              <InterviewCard
+                key={interview.id}
+                {...interview}
+                userId={user.id}
+              />
             ))
           ) : (
             <p className="text-white text-md md:text-xl lg:text-sm">

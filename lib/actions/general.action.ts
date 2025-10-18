@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-//Lint Fixes:
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 //Server Side Rendering
 "use server";
 
@@ -9,7 +7,12 @@
 import { db } from "@/firebase/admin";
 import { generateText } from "ai";
 import { groq } from "@ai-sdk/groq";
-import { Feedback, feedbackSchema, FeedbackWithId } from "@/constants/index";
+import {
+  AIFeedback,
+  aiFeedbackSchema,
+  DBFeedback,
+  FeedbackWithId,
+} from "@/constants/index";
 import { logger } from "@/lib/logger";
 
 //Types:
@@ -210,122 +213,114 @@ export const createFeedback = async (params: CreateFeedbackParams) => {
       })
       .join("\n");
 
-    // Add retry logic for AI generation
-    let attemptCount = 0;
-    const maxAttempts = 3;
+    // Generate feedback from AI (single attempt, no retry)
     let feedbackText = "";
+    try {
+      const { text } = await generateText({
+        model: groq("llama-3.3-70b-versatile"),
+        prompt: `You are an expert AI interviewer conducting a comprehensive analysis of a mock interview. Your task is to provide detailed, constructive feedback based on the candidate's performance. Be objective and thorough in your evaluation.
 
-    while (attemptCount < maxAttempts) {
-      try {
-        const { text } = await generateText({
-          model: groq("llama-3.3-70b-versatile"),
-          prompt: `You are an expert AI interviewer conducting a comprehensive analysis of a mock interview. Your task is to provide detailed, constructive feedback based on the candidate's performance. Be objective and thorough in your evaluation.
+        Analyze the following interview transcript and provide a detailed evaluation in JSON format.
 
-      Analyze the following interview transcript and provide a detailed evaluation in JSON format.
-      
-      === Interview Context ===
-      ${formattedTranscript}
+        === Interview Context ===
+          ${formattedTranscript}
 
-      === Evaluation Guidelines ===
-      1. Score each category from 0-100 based on specific criteria
-      2. Provide detailed comments with examples from the transcript
-      3. List concrete strengths and areas for improvement
-      4. Give actionable recommendations in the final assessment
+        === Evaluation Guidelines ===
+          1. Score each category from 0-100 based on specific criteria
+          2. Provide detailed comments with examples from the transcript
+          3. List concrete strengths and areas for improvement
+          4. Give actionable recommendations in the final assessment
 
-      Return a valid JSON object with this exact structure:
-      {
-        "totalScore": number (0-100),
-        "categoryScores": [
+        Return a valid JSON object with this exact structure:
           {
-            "name": "Understanding & Relevance",
-            "score": number (0-100),
-            "comment": "Detailed analysis with specific examples from the interview"
-          },
-          {
-            "name": "Depth of Knowledge & Accuracy",
-            "score": number (0-100),
-            "comment": "Evaluate technical accuracy and depth of responses"
-          },
-          {
-            "name": "Problem-Solving & Reasoning Ability",
-            "score": number (0-100),
-            "comment": "Assess logical thinking and solution approach"
-          },
-          {
-            "name": "Communication & Articulation",
-            "score": number (0-100),
-            "comment": "Evaluate clarity and effectiveness of communication"
-          },
-          {
-            "name": "Professionalism & Attitude",
-            "score": number (0-100),
-            "comment": "Assess professional conduct and demeanor"
+            "totalScore": number (0-100),
+            "categoryScores": [
+              {
+                "name": "Understanding & Relevance",
+                "score": number (0-100),
+                "comment": "Detailed analysis with specific examples from the interview"
+              },
+              {
+                "name": "Depth of Knowledge & Accuracy",
+                "score": number (0-100),
+                "comment": "Evaluate technical accuracy and depth of responses"
+              },
+              {
+                "name": "Problem-Solving & Reasoning Ability",
+                "score": number (0-100),
+                "comment": "Assess logical thinking and solution approach"
+              },
+              {
+                "name": "Communication & Articulation",
+                "score": number (0-100),
+                "comment": "Evaluate clarity and effectiveness of communication"
+              },
+              {
+                "name": "Professionalism & Attitude",
+                "score": number (0-100),
+                "comment": "Assess professional conduct and demeanor"
+              }
+            ],
+            "strengths": ["Clear, specific strengths with examples"],
+            "areasForImprovement": ["Actionable improvement points"],
+            "finalAssessment": "Comprehensive evaluation summary with specific recommendations"
           }
-        ],
-        "strengths": ["Clear, specific strengths with examples"],
-        "areasForImprovement": ["Actionable improvement points"],
-        "finalAssessment": "Comprehensive evaluation summary with specific recommendations"
-      }
 
-      Scoring Criteria:
-      - Understanding & Relevance (0-100): Comprehension of questions and relevance of answers
-      - Depth of Knowledge & Accuracy (0-100): Technical accuracy and completeness
-      - Problem-Solving & Reasoning (0-100): Logical thinking and solution quality
-      - Communication & Articulation (0-100): Clarity and fluency
-      - Professionalism & Attitude (0-100): Professional conduct and engagement
+          Scoring Criteria:
+            - Understanding & Relevance (0-100): Comprehension of questions and relevance of answers
+            - Depth of Knowledge & Accuracy (0-100): Technical accuracy and completeness
+            - Problem-Solving & Reasoning (0-100): Logical thinking and solution quality
+            - Communication & Articulation (0-100): Clarity and fluency
+            - Professionalism & Attitude (0-100): Professional conduct and engagement
 
-      Ensure all scores and feedback are justified with specific examples from the transcript.
-      `,
-        });
-        feedbackText = text;
-        break; // Success! Exit the retry loop
-      } catch (error) {
-        attemptCount++;
-        console.error("Feedback generation attempt failed");
-        if (attemptCount === maxAttempts) {
-          return {
-            success: false,
-            message: "Failed to generate feedback after multiple attempts",
-          };
-        }
-        // Wait before retrying (exponential backoff)
-        await new Promise((resolve) =>
-          setTimeout(resolve, Math.pow(2, attemptCount) * 1000)
-        );
-      }
+          Ensure all scores and feedback are justified with specific examples from the transcript.
+        `,
+      });
+      feedbackText = text;
+    } catch (error) {
+      console.error("Feedback generation failed:", error);
+      return {
+        success: false,
+        message: "Failed to generate feedback. Please try again.",
+      };
     }
+
     // Clean and parse JSON safely with enhanced error handling
-    let data: Feedback | null = null;
+    let aiFeedback: AIFeedback;
     try {
       // Clean the response text
       const cleaned = feedbackText
         .trim()
         .replace(/```json/g, "")
         .replace(/```/g, "")
-        .replace(/^\s*{\s*/, "{") // Clean leading whitespace
-        .replace(/\s*}\s*$/, "}"); // Clean trailing whitespace
+        .replace(/^\s*{\s*/, "{")
+        .replace(/\s*}\s*$/, "}");
 
       // Parse and validate the JSON structure
-      const parsedData = JSON.parse(cleaned);
-
-      // Validate all required fields are present
-      const requiredFields = [
-        "totalScore",
-        "categoryScores",
-        "strengths",
-        "areasForImprovement",
-        "finalAssessment",
-      ];
-      const missingFields = requiredFields.filter(
-        (field) => !(field in parsedData)
-      );
-
-      if (missingFields.length > 0) {
-        console.error("Missing required fields in feedback:", missingFields);
+      let parsedData;
+      try {
+        parsedData = JSON.parse(cleaned);
+      } catch (parseError) {
+        console.error("Invalid JSON format:", parseError);
         return {
           success: false,
           message:
-            "Incomplete feedback generated. Missing required information.",
+            "The AI generated an invalid response format. Please try again.",
+        };
+      }
+
+      // Validate categoryScores structure
+      if (
+        !Array.isArray(parsedData.categoryScores) ||
+        parsedData.categoryScores.length !== 5
+      ) {
+        console.error(
+          "Invalid categoryScores structure:",
+          parsedData.categoryScores
+        );
+        return {
+          success: false,
+          message: "The feedback generation was incomplete. Please try again.",
         };
       }
 
@@ -338,13 +333,13 @@ export const createFeedback = async (params: CreateFeedbackParams) => {
         };
       }
 
-      // Validate using Zod schema
-      data = feedbackSchema.parse(parsedData);
+      // Validate using Zod schema (ONLY validates AI response)
+      aiFeedback = aiFeedbackSchema.parse(parsedData);
 
       // Additional validation for meaningful content
       if (
-        data.strengths.length === 0 ||
-        data.areasForImprovement.length === 0
+        aiFeedback.strengths.length === 0 ||
+        aiFeedback.areasForImprovement.length === 0
       ) {
         console.error("Empty strengths or areas for improvement");
         return {
@@ -361,31 +356,28 @@ export const createFeedback = async (params: CreateFeedbackParams) => {
     }
 
     try {
-      // Store feedback in database with additional metadata
-      const feedback = await db.collection("feedback").add({
+      // Prepare feedback data for database
+      const feedbackData: DBFeedback = {
         interviewId,
         userId,
-        totalScore: data.totalScore,
-        categoryScores: data.categoryScores,
-        strengths: data.strengths,
-        areasForImprovement: data.areasForImprovement,
-        finalAssessment: data.finalAssessment,
+        totalScore: aiFeedback.totalScore,
+        categoryScores: aiFeedback.categoryScores,
+        strengths: aiFeedback.strengths,
+        areasForImprovement: aiFeedback.areasForImprovement,
+        finalAssessment: aiFeedback.finalAssessment,
         createdAt: new Date().toISOString(),
-        metadata: {
-          transcriptLength: transcript.length,
-          generatedAt: new Date().toISOString(),
-          version: "2.0", // For tracking feedback format versions
-        },
-      });
-
-      const result = {
-        success: true,
-        message: "Feedback generated and stored successfully",
-        feedbackId: feedback.id,
-        data: feedback,
       };
 
-      return result;
+      // Store in database (Firebase auto-generates id)
+      const feedback = await db.collection("feedback").add(feedbackData);
+
+      return {
+        success: true,
+        message: "Feedback generated and stored successfully",
+        data: {
+          id: feedback.id, // This is what Agent.tsx expects
+        },
+      };
     } catch (error) {
       console.error("Failed to store feedback in database:", error);
       return {
@@ -395,7 +387,7 @@ export const createFeedback = async (params: CreateFeedbackParams) => {
     }
   } catch (error: any) {
     console.error(
-      "Error saving the feedback for the interview: ",
+      "Error saving the feedback for the interview:",
       error.message || error
     );
     return {

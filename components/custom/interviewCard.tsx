@@ -45,20 +45,27 @@ const InterviewCard = ({
       try {
         const data = await fetchFeedbackById({ interviewId: id, userId });
 
+        // Check if it's an error response
+        if ("success" in data && !data.success) {
+          setFeedback(null);
+          return;
+        }
+
         // Check if data has the properties of Feedback
         if (
           "totalScore" in data &&
           "finalAssessment" in data &&
-          "createdAt" in data
+          "createdAt" in data &&
+          "id" in data
         ) {
           setFeedback({
             id: data.id,
             totalScore: data.totalScore,
             finalAssessment: data.finalAssessment,
-            createdAt: new Date(data.createdAt), // normalize to Date
+            createdAt: new Date(data.createdAt),
           });
         } else {
-          setFeedback(null); // handle error or missing feedback
+          setFeedback(null);
         }
       } catch (error) {
         console.error("Error fetching feedback:", error);

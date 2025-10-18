@@ -146,7 +146,7 @@ const HomePage = async () => {
         <div className="w-full grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-4 justify-items-start">
           {hasPastCommunityInterviews ? (
             communityInterviews?.map((interview: any) => (
-              <InterviewCard key={interview?.id} {...interview} />
+              <InterviewCard key={interview?.id} {...interview} userId={user.id} />
             ))
           ) : (
             <p className="text-left text-md md:text-lg lg:text-sm text-white">

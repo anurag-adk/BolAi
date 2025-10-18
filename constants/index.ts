@@ -144,8 +144,8 @@ export const dummyInterviews = [
   },
 ];
 
-export const feedbackSchema = z.object({
-  totalScore: z.number(), //Out of 100 marks
+export const aiFeedbackSchema = z.object({
+  totalScore: z.number(),
   categoryScores: z
     .array(
       z.object({
@@ -160,16 +160,19 @@ export const feedbackSchema = z.object({
         comment: z.string(),
       })
     )
-    .length(5), // The total scoring will be done in this 5 areas.
-  strengths: z.array(z.string()), //Array of the strengths of the users answer.
-  areasForImprovement: z.array(z.string()), //Array of the weakness of the users answer.
-  finalAssessment: z.string(), //The recommendation that will be provided.
-  id: z.string(),
-  interviewId: z.string(),
-  userId: z.string(),
-  createdAt: z.union([z.string(), z.date()]),
+    .length(5),
+  strengths: z.array(z.string()),
+  areasForImprovement: z.array(z.string()),
+  finalAssessment: z.string(),
 });
 
-export type Feedback = z.infer<typeof feedbackSchema>;
+// Type for what we store in the database
+export interface DBFeedback extends z.infer<typeof aiFeedbackSchema> {
+  interviewId: string;
+  userId: string;
+  createdAt: string;
+}
 
-export type FeedbackWithId = Feedback & { id: string };
+// Type exports
+export type AIFeedback = z.infer<typeof aiFeedbackSchema>;
+export type FeedbackWithId = DBFeedback & { id: string };
