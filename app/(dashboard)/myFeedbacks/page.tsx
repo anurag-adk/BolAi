@@ -50,7 +50,7 @@ const feedbackPage = async () => {
           <div
             className="max-sm:hidden  md:w-[42%] md:h-[26vh] lg:w-[36%] lg:h-[38vh]"
             style={{
-              backgroundImage: `url(/myFeedbacks.png)`,
+              backgroundImage: `url(/myFeedbacks.svg)`,
               backgroundPosition: "center",
               backgroundSize: "cover",
               backgroundRepeat: "no-repeat",

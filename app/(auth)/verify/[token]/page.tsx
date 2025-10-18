@@ -128,7 +128,7 @@ export default function VerifyPage() {
             <div
               className="w-10 h-10 bg-transparent rounded-lg"
               style={{
-                backgroundImage: `url('/motif.png')`,
+                backgroundImage: `url('/motif.svg')`,
                 backgroundPosition: "center",
                 backgroundSize: "cover",
                 backgroundRepeat: "no-repeat",

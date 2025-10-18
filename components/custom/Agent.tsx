@@ -664,7 +664,7 @@ const Agent = ({
                       : ""
                   }`}
                   style={{
-                    backgroundImage: `url('/motif.png')`,
+                    backgroundImage: `url('/motif.svg')`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     backgroundRepeat: "no-repeat",
