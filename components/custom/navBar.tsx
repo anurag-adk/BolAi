@@ -23,7 +23,7 @@ const NavBar = () => {
           <div
             className="w-12 h-12 mr-3"
             style={{
-              backgroundImage: `url('/motif.png')`,
+              backgroundImage: `url('/motif.svg')`,
               backgroundPosition: "center",
               backgroundRepeat: "no-repeat",
               backgroundSize: "cover",

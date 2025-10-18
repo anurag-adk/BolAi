@@ -79,7 +79,7 @@ const HomePage = async () => {
           <div
             className="max-sm:hidden md:w-[40%] md:h-[32vh] lg:w-[20%] lg:h-[30vh]"
             style={{
-              backgroundImage: `url(/backgroundMotif.png)`,
+              backgroundImage: `url(/homePage.svg)`,
               backgroundPosition: "center",
               backgroundSize: "cover",
               backgroundRepeat: "no-repeat",

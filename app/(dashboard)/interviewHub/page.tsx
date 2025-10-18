@@ -122,7 +122,7 @@ const InterviewHubPage = () => {
           <div
             className="max-sm:hidden md:w-[42%] md:h-[14vh] lg:w-[34%] lg:h-[34vh] bg-transparent"
             style={{
-              backgroundImage: `url(/interviewHub.png)`,
+              backgroundImage: `url(/interviewHub.svg)`,
               backgroundPosition: "center",
               backgroundSize: "cover",
               backgroundRepeat: "no-repeat",
