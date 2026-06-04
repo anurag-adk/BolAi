@@ -4,13 +4,12 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBcj0z-H3pJWYD7XtWGoNUxRWNgTL5WEBY",
-  authDomain: "bolai---interview-platfo-b104d.firebaseapp.com",
-  projectId: "bolai---interview-platfo-b104d",
-  storageBucket: "bolai---interview-platfo-b104d.firebasestorage.app",
-  messagingSenderId: "1092253816274",
-  appId: "1:1092253816274:web:422f290cd3284788a9240b",
-  measurementId: "G-EM8GNFG16F",
+  apiKey: "AIzaSyDvx8rIvXxhVRuQ-UdMxlcojiym-zas6qo",
+  authDomain: "bolai404.firebaseapp.com",
+  projectId: "bolai404",
+  storageBucket: "bolai404.firebasestorage.app",
+  messagingSenderId: "566717233995",
+  appId: "1:566717233995:web:b7eb3e3c0281ee19b706ce",
 };
 
 // Initialize Firebase
