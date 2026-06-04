@@ -43,26 +43,33 @@ const InterviewCard = ({
     const getFeedback = async () => {
       if (!userId || !id) return;
       try {
-        const data = await fetchFeedbackById({ interviewId: id, userId });
+        const response = await fetchFeedbackById({ interviewId: id, userId });
 
-        // Check if it's an error response
-        if ("success" in data && !data.success) {
+        // 1. Check if the top-level response indicates a failure
+        if (response && "success" in response && !response.success) {
           setFeedback(null);
           return;
         }
 
-        // Check if data has the properties of Feedback
+        // 2. Extract the payload data node if it exists, otherwise fall back to response
+        const feedbackPayload =
+          response && "data" in response && response.data
+            ? response.data
+            : response;
+
+        // 3. Run validation checks against the unwrapped payload
         if (
-          "totalScore" in data &&
-          "finalAssessment" in data &&
-          "createdAt" in data &&
-          "id" in data
+          feedbackPayload &&
+          "totalScore" in feedbackPayload &&
+          "finalAssessment" in feedbackPayload &&
+          "createdAt" in feedbackPayload &&
+          "id" in feedbackPayload
         ) {
           setFeedback({
-            id: data.id,
-            totalScore: data.totalScore,
-            finalAssessment: data.finalAssessment,
-            createdAt: new Date(data.createdAt),
+            id: feedbackPayload.id,
+            totalScore: feedbackPayload.totalScore,
+            finalAssessment: feedbackPayload.finalAssessment,
+            createdAt: new Date(feedbackPayload.createdAt),
           });
         } else {
           setFeedback(null);
@@ -77,7 +84,7 @@ const InterviewCard = ({
   }, [id, userId]);
 
   const formattedDate = dayjs(
-    feedback?.createdAt || createdAt || Date.now()
+    feedback?.createdAt || createdAt || Date.now(),
   ).format("MMM D, YYYY");
 
   return (
@@ -99,10 +106,10 @@ const InterviewCard = ({
               type === "Technical"
                 ? "bg-blue-600/80"
                 : type === "Non-Technical"
-                ? "bg-purple-600/80"
-                : type === "Mixed"
-                ? "bg-amber-600/80"
-                : "bg-lime-600/80"
+                  ? "bg-purple-600/80"
+                  : type === "Mixed"
+                    ? "bg-amber-600/80"
+                    : "bg-lime-600/80"
             } flex justify-center items-center`}
           >
             <div className="text-sm md:text-base lg:text-sm text-white/95 tracking-wide">
@@ -125,7 +132,8 @@ const InterviewCard = ({
           <div className="flex justify-center items-center mr-4">
             <FaStar className="text-lg md:text-2xl lg:text-lg font-semibold text-amber-300 mr-2" />
             <div className="text-sm md:text-lg lg:text-sm">
-              {feedback?.totalScore
+              {feedback?.totalScore !== undefined &&
+              feedback?.totalScore !== null
                 ? `${feedback.totalScore} / 100`
                 : "--- / 100"}
             </div>

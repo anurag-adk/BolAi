@@ -58,7 +58,7 @@ export async function fetchGeneratedInterviews(params: {
     //Return The Array:
     return interviewData;
   } catch (error: any) {
-    console.error("Error fetching interviews");
+    console.error("REAL FIREBASE ERROR:", error);
     return null;
   }
 }
@@ -74,7 +74,7 @@ export async function fetchLatestGeneratedInterviews(params: {
     // Validate userId parameter
     if (!userId || userId === undefined || userId === null) {
       console.error(
-        "fetchLatestGeneratedInterviews: userId is undefined or null"
+        "fetchLatestGeneratedInterviews: userId is undefined or null",
       );
       return null;
     }
@@ -105,7 +105,7 @@ export async function fetchLatestGeneratedInterviews(params: {
     //Return the array:
     return interviewData;
   } catch (error: any) {
-    console.error("Error fetching interviews");
+    console.error("REAL FIREBASE ERROR:", error);
     return null;
   }
 }
@@ -113,8 +113,10 @@ export async function fetchLatestGeneratedInterviews(params: {
 import { InterviewResponse } from "@/types/api";
 import { InterviewData, QuestionData } from "@/types/interview";
 
-interface FirebaseInterviewData
-  extends Omit<InterviewData, "id" | "questions"> {
+interface FirebaseInterviewData extends Omit<
+  InterviewData,
+  "id" | "questions"
+> {
   userId: string;
   finalized?: boolean;
   createdAt: string;
@@ -124,7 +126,7 @@ interface FirebaseInterviewData
 export const fetchInterviewsById = async (
   interviewId: string,
   userId: string, // Making userId required for security
-  includeQuestions: boolean = false
+  includeQuestions: boolean = false,
 ): Promise<InterviewResponse> => {
   try {
     // 1. Validate input parameters
@@ -182,7 +184,7 @@ export const fetchInterviewsById = async (
     console.error("Error fetching the interviews: ", error.message || error);
     console.error(
       "The provided interview Id is invalid. InterviewId:",
-      interviewId
+      interviewId,
     );
     return {
       success: false,
@@ -316,7 +318,7 @@ export const createFeedback = async (params: CreateFeedbackParams) => {
       ) {
         console.error(
           "Invalid categoryScores structure:",
-          parsedData.categoryScores
+          parsedData.categoryScores,
         );
         return {
           success: false,
@@ -388,7 +390,7 @@ export const createFeedback = async (params: CreateFeedbackParams) => {
   } catch (error: any) {
     console.error(
       "Error saving the feedback for the interview:",
-      error.message || error
+      error.message || error,
     );
     return {
       success: false,
@@ -396,7 +398,7 @@ export const createFeedback = async (params: CreateFeedbackParams) => {
     };
   }
 };
-//This will fetch the feedback info from db and render to the user:
+// This will fetch the feedback info from db and render to the user:
 export async function fetchFeedbackById(params: {
   interviewId: string;
   userId: string;
@@ -406,6 +408,7 @@ export async function fetchFeedbackById(params: {
     const { interviewId, userId, feedbackId } = params;
     let feedbackDoc: FeedbackWithId | null = null;
 
+    // 1. Fetch by direct Feedback ID if provided
     if (feedbackId) {
       const docSnap = await db.collection("feedback").doc(feedbackId).get();
 
@@ -421,6 +424,7 @@ export async function fetchFeedbackById(params: {
         ...(docSnap.data() as Omit<FeedbackWithId, "id">),
       };
     } else {
+      // 2. Otherwise fall back to looking up by matching user and interview constraints
       const querySnap = await db
         .collection("feedback")
         .where("userId", "==", userId)
@@ -442,6 +446,7 @@ export async function fetchFeedbackById(params: {
       };
     }
 
+    // 3. Security validation rules
     if (feedbackDoc.interviewId !== interviewId) {
       return {
         success: false,
@@ -456,7 +461,12 @@ export async function fetchFeedbackById(params: {
       };
     }
 
-    return feedbackDoc;
+    // FIX: Encapsulate payload into standard object wrapper expected by frontend components
+    return {
+      success: true,
+      message: "Feedback data fetched successfully.",
+      data: feedbackDoc,
+    };
   } catch (error) {
     console.error("Error while fetching feedback info.", error);
     return {
@@ -469,7 +479,7 @@ export async function fetchFeedbackById(params: {
 //SECURITY FIX: New function to fetch interview questions only when user starts the interview
 export const fetchInterviewQuestions = async (
   interviewId: string,
-  userId: string
+  userId: string,
 ) => {
   try {
     // Validate inputs
@@ -504,7 +514,7 @@ export const fetchInterviewQuestions = async (
     if (interviewData.userId !== userId) {
       if (!interviewData.finalized) {
         console.error(
-          `Unauthorized: User ${userId} tried to access questions for private interview ${interviewId} owned by ${interviewData.userId}`
+          `Unauthorized: User ${userId} tried to access questions for private interview ${interviewId} owned by ${interviewData.userId}`,
         );
         return {
           success: false,
@@ -514,7 +524,7 @@ export const fetchInterviewQuestions = async (
       }
 
       console.log(
-        `Community interview access: User ${userId} accessing interview ${interviewId}`
+        `Community interview access: User ${userId} accessing interview ${interviewId}`,
       );
     }
 
@@ -526,7 +536,7 @@ export const fetchInterviewQuestions = async (
   } catch (error: any) {
     console.error(
       "Error fetching interview questions:",
-      error.message || error
+      error.message || error,
     );
     return {
       success: false,
@@ -577,7 +587,7 @@ export async function fetchFeedbacksForUser(userId: string) {
           ...feedbackData,
           interview: interviewData,
         };
-      })
+      }),
     );
     if (!feedbacksWithInterviewsInfo) {
       return {

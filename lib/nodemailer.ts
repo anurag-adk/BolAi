@@ -82,7 +82,7 @@ export const sendMail = async (payload: mailPayload) => {
             </ul>
 
             <div style="text-align: center; margin: 30px 0;">
-                <a href="https://bolai.vercel.app/login" 
+                <a href="https://bolai-dev.vercel.app/login" 
                 style="background: #4f46e5; color: #fff; text-decoration: none; font-size: 16px; padding: 12px 24px; border-radius: 6px; font-weight: bold;">
                     Start Your Journey
                 </a>

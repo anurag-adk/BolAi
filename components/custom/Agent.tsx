@@ -52,12 +52,12 @@ const Agent = ({
   //useState Hook:
   const router = useRouter();
   const [speakingRole, setSpeakingRole] = useState<"user" | "assistant" | null>(
-    null
+    null,
   );
   const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
   const [messages, setMessages] = useState<SavedMessage[]>([]);
   const [speechTimeoutId, setSpeechTimeoutId] = useState<NodeJS.Timeout | null>(
-    null
+    null,
   );
 
   // Constants
@@ -104,7 +104,7 @@ const Agent = ({
         // Check if this is the confirmation message
         if (output.includes("confirm") && output.includes("role:")) {
           console.log(
-            "✅ CONFIRMATION DETECTED: Assistant is confirming collected data"
+            "✅ CONFIRMATION DETECTED: Assistant is confirming collected data",
           );
         }
 
@@ -114,14 +114,14 @@ const Agent = ({
           output.includes("personalized questions")
         ) {
           console.log(
-            "🔧 API CALL PREPARATION: Assistant preparing to call generateInterview API"
+            "🔧 API CALL PREPARATION: Assistant preparing to call generateInterview API",
           );
         }
 
         // Check for API call indicators
         if (
           output.includes("post") ||
-          output.includes("https://bolai.vercel.app")
+          output.includes("https://bolai-dev.vercel.app")
         ) {
           console.log("🌐 API CALL DETECTED: Assistant making HTTP request");
         }
@@ -142,15 +142,15 @@ const Agent = ({
           output.includes("wrong")
         ) {
           console.log(
-            "❌ API ERROR DETECTED: Something went wrong with the API call"
+            "❌ API ERROR DETECTED: Something went wrong with the API call",
           );
           console.log(
             "🔍 Debug info - Raw output type:",
-            typeof message.output
+            typeof message.output,
           );
           console.log(
             "🔍 Debug info - Is array:",
-            Array.isArray(message.output)
+            Array.isArray(message.output),
           );
           console.log("🔍 Debug info - Output received");
         }
@@ -158,10 +158,10 @@ const Agent = ({
         // Check for direct API call indicators
         if (
           output.includes("POST") ||
-          output.includes("https://bolai.vercel.app")
+          output.includes("https://bolai-dev.vercel.app")
         ) {
           console.log(
-            "🌐 DIRECT API CALL DETECTED: Assistant making HTTP request"
+            "🌐 DIRECT API CALL DETECTED: Assistant making HTTP request",
           );
         }
 
@@ -171,21 +171,21 @@ const Agent = ({
           output.includes("crush this")
         ) {
           console.log(
-            "✅ API CALL COMPLETED: Interview questions generated successfully"
+            "✅ API CALL COMPLETED: Interview questions generated successfully",
           );
         }
 
         // Check for model-specific issues
         if (output.includes("I recommend 5 to 1")) {
           console.log(
-            "⚠️ MODEL ISSUE DETECTED: Output seems truncated - possible GPT-5 configuration problem"
+            "⚠️ MODEL ISSUE DETECTED: Output seems truncated - possible GPT-5 configuration problem",
           );
         }
 
         // Check for incomplete responses after question count
         if (output.includes("How many questions") && output.length < 50) {
           console.log(
-            "⚠️ TRUNCATED RESPONSE: GPT-5 might be cutting off responses"
+            "⚠️ TRUNCATED RESPONSE: GPT-5 might be cutting off responses",
           );
         }
       }
@@ -205,11 +205,11 @@ const Agent = ({
           message.toolCalls.forEach((tool: any, index: number) => {
             console.log(
               `🛠️ Tool ${index + 1}:`,
-              tool.function?.name || tool.name
+              tool.function?.name || tool.name,
             );
             console.log(
               `🛠️ Tool arguments:`,
-              tool.function?.arguments || tool.arguments
+              tool.function?.arguments || tool.arguments,
             );
           });
         }
@@ -234,7 +234,7 @@ const Agent = ({
         ];
 
         const hasQuestionCount = numberPatterns.some((pattern) =>
-          pattern.test(transcript)
+          pattern.test(transcript),
         );
 
         if (hasQuestionCount) {
@@ -242,35 +242,35 @@ const Agent = ({
           console.log("🎯 Transcript:", message.transcript);
           console.log("🎯 Enhanced pattern match detected");
           console.log(
-            "🎯 Assistant should now IMMEDIATELY confirm all data and proceed to tool call"
+            "🎯 Assistant should now IMMEDIATELY confirm all data and proceed to tool call",
           );
           console.log(
-            "🎯 VOICE vs CHAT: This works in chat, checking voice processing..."
+            "🎯 VOICE vs CHAT: This works in chat, checking voice processing...",
           );
 
           // Additional validation logging
           setTimeout(() => {
             console.log(
-              "⏰ 3 seconds passed - checking if assistant responded to question count..."
+              "⏰ 3 seconds passed - checking if assistant responded to question count...",
             );
             console.log("📊 Expected: model-output with confirmation message");
             console.log(
-              "📊 If no model-output appears, the issue is in Vapi assistant dashboard configuration"
+              "📊 If no model-output appears, the issue is in Vapi assistant dashboard configuration",
             );
             console.log(
-              "💡 COMPARISON: This same input works perfectly in chat interface"
+              "💡 COMPARISON: This same input works perfectly in chat interface",
             );
           }, 3000);
 
           setTimeout(() => {
             console.log(
-              "⏰ 10 seconds passed - assistant definitely failed to respond"
+              "⏰ 10 seconds passed - assistant definitely failed to respond",
             );
             console.log(
-              "🚨 DIAGNOSIS: System prompt in Vapi dashboard is not working properly"
+              "🚨 DIAGNOSIS: System prompt in Vapi dashboard is not working properly",
             );
             console.log(
-              "🚨 ACTION REQUIRED: Update system prompt in Vapi dashboard immediately"
+              "🚨 ACTION REQUIRED: Update system prompt in Vapi dashboard immediately",
             );
           }, 10000);
         }
@@ -337,7 +337,7 @@ const Agent = ({
 
         console.log(
           "💾 Saving final message and clearing speaking state:",
-          newMessage
+          newMessage,
         );
         setMessages((prev) => [...prev, newMessage]);
       }
@@ -354,7 +354,7 @@ const Agent = ({
         // Special handling for generateInterview tool
         if (message.type === "tool-calls" || message.type === "function-call") {
           console.log(
-            "🎯 GENERATING INTERVIEW: Tool call initiated successfully!"
+            "🎯 GENERATING INTERVIEW: Tool call initiated successfully!",
           );
         }
 
@@ -363,7 +363,7 @@ const Agent = ({
           message.type === "function-call-result"
         ) {
           console.log(
-            "✅ INTERVIEW GENERATED: Tool call completed successfully!"
+            "✅ INTERVIEW GENERATED: Tool call completed successfully!",
           );
         }
       }
@@ -371,7 +371,7 @@ const Agent = ({
 
     const onSpeechStart = () => {
       console.log(
-        "Speech started - waiting for transcript to determine speaker"
+        "Speech started - waiting for transcript to determine speaker",
       );
       // Don't set speaking role here, wait for transcript to determine who's speaking
     };
@@ -395,7 +395,7 @@ const Agent = ({
 
       if (error?.type === "start-method-error") {
         console.log(
-          "Start method error detected - this is usually not critical, ignoring..."
+          "Start method error detected - this is usually not critical, ignoring...",
         );
         return;
       }
@@ -409,14 +409,14 @@ const Agent = ({
       if (error?.type === "function-call-error") {
         console.error(
           "🚨 Function call error - this might cause call to end abruptly:",
-          error
+          error,
         );
       }
 
       if (error?.type === "assistant-error") {
         console.error(
           "🚨 Assistant error - check your system prompt and assistant configuration:",
-          error
+          error,
         );
       }
 
@@ -485,7 +485,7 @@ const Agent = ({
         if (result.success && result.data?.id) {
           toast.success("Successfully generated the feedback!");
           await router.push(
-            `/interview/${interviewId}/feedback/${result.data.id}`
+            `/interview/${interviewId}/feedback/${result.data.id}`,
           );
         } else {
           toast.error(result.message || "Error generating feedback");
@@ -499,7 +499,7 @@ const Agent = ({
         await router.push("/home");
       }
     },
-    [interviewId, userId, router]
+    [interviewId, userId, router],
   );
 
   //useEffect Hook when call status changes:
@@ -586,7 +586,7 @@ const Agent = ({
               voiceId,
               provider: "vapi",
             },
-          }
+          },
         );
         toast.success("Vapi call initiated successfully");
       }

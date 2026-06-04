@@ -17,44 +17,57 @@ import {
 //Components:
 import FeedbackProgressCard from "@/components/custom/FeedbackProgressCard";
 
-const feedbackPage = async ({
-  params,
-}: {
-  params: { id: string; feedbackId: string };
-}) => {
+// FIX 1: Explicitly define PageProps where params is a Promise
+interface PageProps {
+  params: Promise<{
+    id: string;
+    feedbackId: string;
+  }>;
+}
+
+const feedbackPage = async ({ params }: PageProps) => {
   const user = await getCurrentUser();
-  const id = params.id;
-  const feedbackId = params.feedbackId;
 
   // Authentication check
   if (!user) {
     redirect("/login");
   }
 
-  //Check if the provided link has valid interview:
+  // FIX 2: Unwrap params before accessing its keys
+  const resolvedParams = await params;
+  const id = resolvedParams.id;
+  const feedbackId = resolvedParams.feedbackId;
+
+  // Check if the provided link has a valid interview
   const interview = await fetchInterviewsById(id, user.id, false);
   if (!interview || !interview.success) {
     redirect("/home");
   }
 
-  //Fetch The Feedback Info:
-  const feedbackInfo = await fetchFeedbackById({
+  // Fetch The Feedback Info
+  const feedbackResponse = await fetchFeedbackById({
     interviewId: id,
-    userId: user.id, // User is guaranteed to exist here
+    userId: user.id,
     feedbackId,
   });
 
-  // Improved error handling
-  if (!feedbackInfo || "success" in feedbackInfo) {
+  // FIX 3: Check response wrapper and cleanly extract internal data asset
+  if (
+    !feedbackResponse ||
+    !feedbackResponse.success ||
+    !feedbackResponse.data
+  ) {
     redirect("/myFeedbacks");
   }
 
-  // Type guard to ensure feedbackInfo has required properties
+  const feedbackInfo = feedbackResponse.data;
+
+  // Type guard validation checks
   if (!feedbackInfo.totalScore || !feedbackInfo.categoryScores) {
     redirect("/myFeedbacks");
   }
 
-  //Determining the trail and path color of the progress bar:
+  // Determining the trail and path color of the progress bar:
   const getProgressColors = () => {
     return {
       pathColor: "#4ade80", // light greenish (green-400)
@@ -224,6 +237,7 @@ const feedbackPage = async ({
             </div>
           </div>
         )}
+
         {/* Section 4: Final Assessment */}
         {feedbackInfo.finalAssessment && (
           <div className="w-full mb-8">
